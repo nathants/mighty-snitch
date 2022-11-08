@@ -1,0 +1,66 @@
+# Maintainer: Caleb Connolly <caleb@connolly.tech>
+# Co-Maintainer: Joel Selvaraj <jo@jsfamily.in>
+# Stable Linux kernel with patches for SDM845 devices
+# Kernel config based on: arch/arm64/configs/defconfig and sdm845.config
+
+_flavor="postmarketos-qcom-sdm845"
+pkgname=linux-$_flavor
+pkgver=6.1.0_rc3
+pkgrel=0
+pkgdesc="Mainline Kernel fork for SDM845 devices"
+arch="aarch64"
+_carch="arm64"
+url="https://gitlab.com/sdm845-mainline/linux"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps
+	pmb:cross-native
+	pmb:kconfigcheck-community"
+makedepends="bash bison findutils flex installkernel openssl-dev perl"
+depends="libnetfilter_queue-dev foot gcc musl-dev linux-headers py3-blessed py3-pip coreutils xhost procps bash"
+
+_config="config-$_flavor.$arch"
+_tag="sdm845-6.1.0_rc3"
+
+# Source
+source="
+	linux-$_tag.tar.gz::https://gitlab.com/sdm845-mainline/linux/-/archive/$_tag/linux-$_tag.tar.gz
+    0001-snitch.patch
+	$_config
+"
+builddir="$srcdir/linux-$_tag"
+
+prepare() {
+	default_prepare
+	cp "$srcdir/config-$_flavor.$arch" .config
+    cd $builddir
+    if [ 0 = $(find -name snitch.c | wc -l) ]; then
+        patch -s -p1 -N -i $srcdir/0001-snitch.patch # the triple paths with APKBUILD are probably causing this. only patch once
+    fi
+}
+
+build() {
+	unset LDFLAGS
+	make ARCH="$_carch" CC="${CC:-gcc}" KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-${_flavor}-Snitch"
+}
+
+package() {
+	install -Dm644 "$builddir/arch/$_carch/boot/Image.gz" \
+		"$pkgdir/boot/vmlinuz"
+
+	make modules_install dtbs_install \
+		ARCH="$_carch" \
+		INSTALL_PATH="$pkgdir"/boot/ \
+		INSTALL_MOD_PATH="$pkgdir" \
+		INSTALL_MOD_STRIP=1 \
+		INSTALL_DTBS_PATH="$pkgdir"/boot/dtbs
+	rm -f "$pkgdir"/lib/modules/*/build "$pkgdir"/lib/modules/*/source
+
+	install -D "$builddir"/include/config/kernel.release \
+		"$pkgdir"/usr/share/kernel/$_flavor/kernel.release
+}
+
+sha512sums="
+a4096863f06d00edba6af76f89ea24047badba5d1d1363ba31701dd1088aab34c470a5552b8b3db4cb5d21065496ccac9aa59c05e4d15561d4cfb03706d8962e  linux-sdm845-6.1.0_rc3.tar.gz
+910b1b58bc505efe95a1cd37bb74380f02b863d036a3040fac9995cb2717fcc007dfd75d3edc0dab2be7852292c6f2441a369971ad2001fc0f4e4082e5790175  0001-snitch.patch
+7fa85bcf695256d0d1fb910c50ce4c28688144e8614e83551259df9c91180c6f7cd3f4e700a89caf74a6b2a306fa4cb515ce6ebf9fc570e954e1320519c18765  config-postmarketos-qcom-sdm845.aarch64
+"

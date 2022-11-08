@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""
+colorize parts of lines to arbitrary colors
+
+usage: echo a b c | color 0:green 1:red 2:blue
+
+usage: echo a b c | color a:green c:red
+
+usage: echo /a/b/c | sep=/ color a:green c:red
+
+usage: echo /a123/b/c | sep=/ sub=y color a:green c:red
+
+usage: echo /a123/b/c | sep=/ sub=y ljust=10 color a:green c:red
+"""
+import functools
+import sys
+import os
+import sys
+
+# make colors
+_colors = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
+_pairs = zip(_colors, range(31, 38))
+def _make_color(code, text):
+    return "\033[{}m{}\033[0m".format(code, text)
+for _color, _num in _pairs:
+    globals()[_color] = functools.partial(_make_color, _num)
+
+# print help
+if '-h' in sys.argv or '--help' in sys.argv:
+    print('colors:', ' | '.join(_colors))
+    print(__doc__)
+    sys.exit(1)
+
+# create map of token => color function
+colors = {token: globals()[color]
+          for arg in sys.argv[1:]
+          for token, color in [arg.split(':')]}
+
+# default ljust is 0
+ljust = int(os.environ.get('ljust', '0'))
+
+# default sep is whitespace
+sep = os.environ.get('sep')
+
+# default to exact match, use SUB=y for substring match
+sub = 'sub' in os.environ
+
+for line in sys.stdin:
+    # if line contains any token
+    if any(token in line for token in colors) or any(token.isdigit() for token in colors):
+        # for each part of the line
+        parts = []
+        for i, part in enumerate(line.rstrip().split(sep)):
+            # colorize part by first matching substring
+            if sub:
+                for t in colors:
+                    if t in part:
+                        part = colors[t](part)
+                        if ljust:
+                            part = part.ljust(ljust + 9)
+                        break
+            # colorize part by exact match
+            else:
+                if part in colors:
+                    part = colors[part](part)
+                    if ljust:
+                        part = part.ljust(ljust + 9)
+                elif str(i) in colors:
+                    part = colors[str(i)](part)
+                    if ljust:
+                        part = part.ljust(ljust + 9)
+
+            parts.append(part)
+        sys.stdout.write((sep or ' ').join(parts) + '\n')
+    else:
+        sys.stdout.write(line)
+    sys.stdout.flush()

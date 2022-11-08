@@ -1,0 +1,17 @@
+name: mighty-snitch
+
+s3:
+  ${MIGHTY_SNITCH_S3_BUCKET}:
+    attr:
+      - acl=private
+
+vpc:
+  relay:
+    security-group:
+      relay:
+        rule:
+          - tcp:22:0.0.0.0/0
+
+keypair:
+  relay:
+    pubkey-content: ${MIGHTY_SNITCH_PUBKEY_CONTENT}

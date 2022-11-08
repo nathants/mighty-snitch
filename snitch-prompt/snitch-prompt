@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+# type: ignore
+import os
+import time
+import blessed
+import sys
+import termios
+import tty
+import contextlib
+import threading
+import queue
+import re
+
+_rm_color = re.compile(r'\x1b[^m]*m')
+
+def rm_color(text):
+    return _rm_color.sub('', text)
+
+def _make_color(code, text):
+    return "\033[{}m{}\033[0m".format(code, text)
+
+black   = lambda text: _make_color(30, text)
+red     = lambda text: _make_color(31, text)
+green   = lambda text: _make_color(32, text)
+yellow  = lambda text: _make_color(33, text)
+blue    = lambda text: _make_color(34, text)
+magenta = lambda text: _make_color(35, text)
+cyan    = lambda text: _make_color(36, text)
+white   = lambda text: _make_color(37, text)
+clear   = lambda text: _make_color(38, text)
+
+def getch(q):
+    while True:
+        val = sys.stdin.read(1).lower()
+        if val == '\x03':
+            sys.exit(1)
+        else:
+            q.put(val)
+
+@contextlib.contextmanager
+def raw():
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        yield
+    except KeyboardInterrupt:
+        sys.exit(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
+delay = .35
+
+def paths(path):
+    res = [path]
+    parts = path.split('/')
+    for i in range(len(parts)):
+        val = '/'.join(parts[:-i])
+        if val:
+            res.append(val + '/')
+    return res
+
+def addrs(addr):
+    vals = []
+    parts = addr.split('.')
+    for i in range(1, len(parts)):
+        if i > 4:
+            break
+        if i > 1:
+            vals.append('*.' + '.'.join(parts[-i:]))
+    vals.append('*')
+    vals.append(addr)
+    return vals
+
+def main():
+    msg, outfile = sys.argv[1:]
+    interval = float(os.environ.get('SNITCH_PROMPT_INTERVAL', '0.01'))
+    with raw():
+        q = queue.Queue()
+        t = threading.Thread(target=getch, args=[q])
+        t.daemon = True
+        t.start()
+
+        t = blessed.Terminal()
+
+        with t.fullscreen(), t.hidden_cursor():
+
+            start = time.monotonic()
+            duration = '1-minute'
+
+            txt = msg
+            txt = txt.replace('\\n', '\n')
+            kind, rest = txt.split('\n', 1)
+            if kind == 'send':
+                exe, target, cmdline = rest.strip().splitlines()
+                cmdline_orig = cmdline
+                addr, port, proto = target.split('\t')
+                addr_orig = addr
+                if port.strip().isdigit() and int(port) > 32_000:
+                    port = 'ephemeral'
+            elif kind == 'recv':
+                exe, target, cmdline = rest.strip().splitlines()
+                cmdline_orig = cmdline
+                port, proto = target.split('\t')
+                port = port
+                if port.strip().isdigit() and int(port) > 32_000:
+                    port = 'ephemeral'
+            elif kind in ['read', 'write', 'exec', 'unknown']:
+                exe, path, cmdline = rest.strip().splitlines()
+                path_orig = path
+                cmdline_orig = cmdline
+            else:
+                assert False, f'unknown kind: {kind}'
+
+            while True:
+
+                if kind == 'send':
+                    if proto in ['tcp', 'udp']:
+                        txt = f'{white("send")}\n{white("d")}uration={cyan(duration)}\nexe={red(exe)}\n{white("a")}ddr={green(addr)}\nport={blue(port)}\nproto={yellow(proto)}\n{white("c")}mdline={magenta(cmdline)}'
+                    elif proto == 'unix':
+                        txt = f'{white("send")}\n{white("d")}uration={cyan(duration)}\nexe={red(exe)}\nport={blue(port)}\nproto={yellow(proto)}\n{white("c")}mdline={magenta(cmdline)}'
+                    else:
+                        txt = f'{white("send")}\n{white("d")}uration={cyan(duration)}\nexe={red(exe)}\nproto={yellow(proto)}\n{white("c")}mdline={magenta(cmdline)}'
+                elif kind == 'recv':
+                    if proto in ['tcp', 'udp', 'unix']:
+                        txt = f'{white("recv")}\n{white("d")}uration={cyan(duration)}\nexe={red(exe)}\nport={blue(port)}\nproto={yellow(proto)}\n{white("c")}mdline={magenta(cmdline)}'
+                    else:
+                        txt = f'{white("recv")}\n{white("d")}uration={cyan(duration)}\nexe={red(exe)}\nproto={yellow(proto)}\n{white("c")}mdline={magenta(cmdline)}'
+                elif kind in ['read', 'write', 'exec', 'unknown']:
+                    txt = f'{white(kind)}\n{white("d")}uration={cyan(duration)}\nexe={red(exe)}\n{white("p")}ath={blue(path)}\n{white("c")}mdline={magenta(cmdline)}'
+                else:
+                    assert False, f'unknown kind: {kind}'
+
+                txt += f'\n{white("y")} / {white("n")} ?'
+                txt = txt.replace('\t', ' ')
+                txt = txt.replace('\n', '\n\n')
+
+                print(t.move_xy(0, 0), file=sys.stderr)
+                print(t.clear, file=sys.stderr)
+                y = (t.height - len(txt.splitlines())) // 2
+                for i, line in enumerate(txt.splitlines()):
+                    print(t.move_xy(t.width // 2 - len(rm_color(line)) // 2, y) + line, file=sys.stderr)
+                    y += 1
+                elapsed = time.monotonic() - start
+
+                y += 1
+                remaining = int(30 - elapsed)
+                timeout_txt = f'{remaining}s'
+                print(t.move_xy(t.width // 2 - len(timeout_txt) // 2, y) + timeout_txt)
+
+                if delay != 0 and elapsed < delay:
+                    progress = 1 - (min(elapsed, delay) / delay)
+                    ptxt = '=' * int(progress * 40)
+                    y += 1
+                    print(t.move_xy(t.width // 2 - len(rm_color(ptxt)) // 2, y) + ptxt, file=sys.stderr)
+                    time.sleep(interval)
+                    while True:
+                        try:
+                            q.get_nowait() # drain input queue while delayed
+                        except queue.Empty:
+                            break
+
+                else:
+                    try:
+                        if remaining <= 0:
+                            char = 'n'
+                        else:
+                            char = q.get_nowait()
+                    except queue.Empty:
+                        time.sleep(interval)
+                    else:
+                        if char in ['y', 'n']:
+                            if char == 'y':
+                                response = 'allow'
+                            elif char == 'n':
+                                response = 'deny'
+                            if kind == 'send':
+                                with open(outfile, 'w') as f:
+                                    f.write(f'send\x00{response}\x00{duration}\x00{exe}\x00{addr}\x00{port}\x00{proto}\x00{cmdline}')
+                                sys.exit(0)
+                            elif kind == 'recv':
+                                with open(outfile, 'w') as f:
+                                    f.write(f'recv\x00{response}\x00{duration}\x00{exe}\x00{port}\x00{proto}\x00{cmdline}')
+                                sys.exit(0)
+                            elif kind in ['read', 'write', 'exec', 'unknown']:
+                                with open(outfile, 'w') as f:
+                                    f.write(f'{kind}\x00{response}\x00{duration}\x00{exe}\x00{path}\x00{cmdline}')
+                                sys.exit(0)
+                            else:
+                                assert False, f'unknown kind {kind}'
+                        elif char == 'd':
+                            if duration == '1-minute':
+                                duration = '24-hour'
+                            elif duration == '24-hour':
+                                duration = 'forever'
+                            elif duration == 'forever':
+                                duration = '1-minute'
+                        elif char == 'a':
+                            if kind == 'send':
+                                vals = addrs(addr_orig)
+                                i = vals.index(addr.strip())
+                                i += 1
+                                i %= len(vals)
+                                addr = vals[i]
+                        elif char == 'c':
+                            if cmdline.strip() == cmdline_orig:
+                                cmdline = '*'
+                            else:
+                                cmdline = cmdline_orig
+                        elif char == 'p' and kind in ['read', 'write', 'exec', 'unknown']:
+                            vals = paths(path_orig)
+                            i = vals.index(path.strip())
+                            i += 1
+                            i %= len(vals)
+                            path = vals[i]
+
+if __name__ == '__main__':
+    try:
+        main()
+    except SystemExit:
+        raise
+    except:
+        import traceback
+        import time
+        print(traceback.format_exc(), file=sys.stderr)
+        print(sys.argv)
+        input()
