@@ -100,10 +100,13 @@ send  deny  /usr/lib/firefox/firefox  shavar.services.mozilla.com            443
 
 ## install x86_64
 
+copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
+
 ```bash
 cd /tmp
-wget *.apk
-wget *.pub
+wget linux-edge-*.apk
+wget linux-edge-dev-*.apk
+wget me@nathants.com-*.rsa.pub
 sudo mv *.pub /etc/apk/keys/
 sudo apk add *.apk
 sudo reboot
@@ -120,10 +123,12 @@ bash snitch.sh
 
 ## install arm64
 
+copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
+
 ```bash
 cd /tmp
-wget *.apk
-wget *.pub
+wget linux-postmarketos-qcom-sdm845-*.apk
+wget pmos@local-*.rsa.pub
 sudo mv *.pub /etc/apk/keys/
 sudo apk add *.apk
 sudo reboot
