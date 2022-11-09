@@ -8,12 +8,6 @@ it should be easy to notice and prevent network requests.
 
 interactively filter network requests with rules and visual prompts.
 
-## demo
-
-![](https://github.com/nathants/mighty-snitch/raw/master/demo.gif)
-
-![](https://github.com/nathants/mighty-snitch/raw/master/mobile.jpg)
-
 ## what
 
 a [linux security module](https://www.kernel.org/doc/html/latest/security/lsm.html) communicates via [netlink](https://man7.org/linux/man-pages/man7/netlink.7.html) with the userspace [snitch](https://github.com/nathants/mighty-snitch/blob/master/snitch/snitch.c) on each [sendmsg](https://man7.org/linux/man-pages/man3/sendmsg.3p.html)/[recvmsg](https://man7.org/linux/man-pages/man3/recvmsg.3p.html).
@@ -23,6 +17,12 @@ snitch decides whether to allow or deny the network request.
 rules are checked. if no rule exists, a visual prompt is displayed to the user.
 
 finally snitch responds to the kernel and the request is allowed or denied.
+
+## demo
+
+![](https://github.com/nathants/mighty-snitch/raw/master/demo.gif)
+
+![](https://github.com/nathants/mighty-snitch/raw/master/mobile.jpg)
 
 ## hardware
 
