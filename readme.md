@@ -66,7 +66,7 @@ the following are simplifying constraints. other configurations should be possib
 
 - iptables rules should be empty.
 
-- all other lsm modules are disabled.
+- all other lsm are disabled.
 
 - kernel commandline parameters for lsm are ignored.
 
