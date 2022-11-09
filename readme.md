@@ -10,9 +10,9 @@ interactively filter network requests with rules and visual prompts.
 
 ## demo
 
-![](./demo.gif)
+![](https://github.com/nathants/mighty-snitch/raw/master/demo.gif)
 
-![](./mobile.jpg)
+![](https://github.com/nathants/mighty-snitch/raw/master/mobile.jpg)
 
 ## what
 
