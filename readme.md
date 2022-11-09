@@ -2,7 +2,7 @@
 
 ## why
 
-it should be easy to notice and prevent network requests.
+noticing and preventing network requests should be easy.
 
 ## how
 
