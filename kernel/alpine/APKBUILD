@@ -1,11 +1,11 @@
 _flavor=edge
 pkgname=linux-${_flavor}
-pkgver=6.0.7
+pkgver=6.0.8
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=1
+pkgrel=2
 pkgdesc="Linux latest stable kernel"
 url="https://www.kernel.org"
 depends="initramfs-generator py3-blessed py3-pip coreutils musl-dev gcc st libnetfilter_queue-dev linux-headers"
@@ -257,8 +257,8 @@ _dev() {
 
 sha512sums="
 bac41a7aeb6e809616cee2f13dcd1c45e829dfd1ccf60aee1dc4c46b1e28532f4485c7d819a32940de84fdfbf89db80a4e919bce8a74b2948c5a01551771b714  linux-6.0.tar.xz
-a25570a289580cd8ca0365a007948b69236517efb4fe53b0f99697bbb8321174f827c2fff24903301eeaec1068456e2fbf2321ef7884e78347211e2b58f09809  patch-6.0.7.xz
+3735050c4da98dd97ca4d30597d34b854f826e7c0eb0740eea545979eede9cf4764f3848ac9907ffc880a55d040e22190954dd0419ccf67fea29319a3ba73250  patch-6.0.8.xz
 910b1b58bc505efe95a1cd37bb74380f02b863d036a3040fac9995cb2717fcc007dfd75d3edc0dab2be7852292c6f2441a369971ad2001fc0f4e4082e5790175  0001-snitch.patch
 32cc2fea2178c78c36d7dd6990c5737be44edabe93fa83836cceeef042a5fb2d0291b6527badac14545c9b9ab2e421e76d23053bedd1223eefd14896d2ed5bc8  config-edge.aarch64
-7afd52505ed8c67051fd75cbc5f2c425862c0f951222578101acea82d5200429e8a5237e28726d6565ad727c1d46d11b6ad59a69aed4aa5ef6175ee5cbbbb753  config-edge.x86_64
+2675e570626508cbfe54b0d758b710f37306aa841bd18030f482b31ac9887829005d7b130142bad7f5858f2e46ab98103fb163305e10f26f137d6c65aacf5dc7  config-edge.x86_64
 "
