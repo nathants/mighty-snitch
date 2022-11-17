@@ -36,7 +36,7 @@ the primary test devices are [thinkpad x1](https://www.lenovo.com/us/en/c/laptop
 
 [open-snitch](https://github.com/evilsocket/opensnitch) which introduced me to [nfq](https://www.netfilter.org/projects/libnetfilter_queue/).
 
-[tiny-snitch](https://github.com/nathants/tinysnitch) which helped me understand what is possible with [nfq](https://www.netfilter.org/projects/libnetfilter_queue/) and [bpftrace](https://github.com/iovisor/bpftrace).
+[tiny-snitch](https://github.com/nathants/tiny-snitch) which helped me understand what is possible with [nfq](https://www.netfilter.org/projects/libnetfilter_queue/) and [bpftrace](https://github.com/iovisor/bpftrace).
 
 [uslm](https://github.com/argussecurity/ulsm) which helped me understand what is possible with [lsm](https://www.kernel.org/doc/html/latest/security/lsm.html).
 
