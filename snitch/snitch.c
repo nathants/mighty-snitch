@@ -359,7 +359,7 @@ char *sub_addr(char *addr, int size, int n) {
     return addr;
 }
 
-rule_t *do_match_rule(event_t *e) {
+rule_t *match_rule(event_t *e) {
     rule_t r = {0};
 
     strncpy(r.exe, e->exe, sizeof(r.exe) - 1);
@@ -473,10 +473,6 @@ rule_t *do_match_rule(event_t *e) {
         }
     }
     return NULL;
-}
-
-rule_t *match_rule(event_t *e) {
-    return do_match_rule(e);
 }
 
 pthread_mutex_t prompt_lock;
@@ -1079,9 +1075,12 @@ void *loop_nfq(void *vargp) {
     char buf[4096] __attribute__ ((aligned));
     int rcvd, opt = 1;
     setsockopt(fd, SOL_NETLINK, NETLINK_NO_ENOBUFS, &opt, sizeof(int));
-    while ((rcvd = recv(fd, buf, sizeof(buf), 0)) && rcvd >= 0)
+    while (1) {
+        memset(buf, 0, sizeof(buf));
+        rcvd = recv(fd, buf, sizeof(buf), 0);
+        ASSERT(rcvd >= 0, "nfq failed: errno: %d\n", errno);
         nfq_handle_packet(h, buf, rcvd);
-    ASSERT(0, "nfq failed: errno: %d\n", errno);
+    }
     return NULL;
 }
 
