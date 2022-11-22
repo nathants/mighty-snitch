@@ -371,7 +371,7 @@ rule_t *match_rule(event_t *e) {
         if (e->net_remote_domain[0] != 0) {
             strncpy(r.addr, e->net_remote_domain, sizeof(r.addr));
         } else {
-            strcpy(r.addr, inet_ntoa(sin->sin_addr));
+            ntoa(sin->sin_addr, r.addr, sizeof(r.addr));
         }
         if (e->type == SOCK_DGRAM) {
             strcpy(r.proto, "udp");
@@ -515,8 +515,8 @@ void log_decision(event_t *e, i32 response) {
         struct sockaddr *sa = (struct sockaddr*)e->databuf;
         if (sa->sa_family == AF_INET) {
             struct sockaddr_in *sin_remote = (struct sockaddr_in*)e->databuf;
-            char addr_remote[16];
-            strcpy(addr_remote, inet_ntoa(sin_remote->sin_addr));
+            char addr_remote[18] = {0};
+            ntoa(sin_remote->sin_addr, addr_remote, sizeof(addr_remote));
             if (!e->net_remote_domain[0]) {
                 LOG("%s %s %d %s %s %d %s %s\n", response_name, "send", e->pid, e->exe, addr_remote, ntohs(sin_remote->sin_port), proto, e->cmdline);
             } else {
@@ -536,8 +536,9 @@ static int dns_parse_callback(unsigned char *qname, int rr, const void *data, in
         if (len != 4)
             return -1;
         char *tmp;
-        char *addr = inet_ntoa(*(struct in_addr*)data);
-        i32 size = 16;
+        char addr[18] = {0};
+        ntoa(*(struct in_addr*)data, addr, sizeof(addr));
+        i32 size = sizeof(addr);
         pthread_mutex_lock(&dns_lock); {
             MAP_FIND_INDEX(dns, addr, size);
             if (!MAP_KEY(dns)) {
@@ -568,8 +569,8 @@ void resolve_dns(event_t *e) {
     struct sockaddr *sa = (struct sockaddr*)e->databuf;
     if (sa->sa_family == AF_INET) {
         struct sockaddr_in *sin_remote = (struct sockaddr_in*)e->databuf;
-        char addr[16] = {0};
-        strcpy(addr, inet_ntoa(sin_remote->sin_addr));
+        char addr[18] = {0};
+        ntoa(sin_remote->sin_addr, addr, sizeof(addr));
         pthread_mutex_lock(&dns_lock); {
             MAP_FIND_INDEX(dns, addr, sizeof(addr));
             if (MAP_KEY(dns)) {
@@ -785,8 +786,8 @@ void do_prompt(result_t *result, event_t *e) {
     }
     else if (0 == strcmp(e->namebuf, "socket_sendmsg")) {
         struct sockaddr_in *sin_remote = (struct sockaddr_in*)e->databuf;
-        char addr_remote[16];
-        strcpy(addr_remote, inet_ntoa(sin_remote->sin_addr));
+        char addr_remote[18] = {0};
+        ntoa(sin_remote->sin_addr, addr_remote, sizeof(addr_remote));
         char *addr = addr_remote;
         if (e->net_remote_domain[0] != 0) {
             addr = e->net_remote_domain;

@@ -1,9 +1,6 @@
 #!/bin/bash
 set -xeou pipefail
 
-sudo kill $(ps -ef | grep '\./snitch' | awk '{print $2}') || true
-sleep 1
-
 cd $(dirname $0)
 
 rm -f snitch
@@ -19,6 +16,11 @@ gcc \
     $(pkg-config libnetfilter_queue --cflags --libs)
 
 echo start snitch
+
+sudo kill $(ps -ef | grep '\./snitch' | awk '{print $2}') || true
+sleep 1
+
+sudo rm -f /tmp/snitch*
 
 # wayland postmarketos needs to do this to allow root gui access
 if which foot &>/dev/null; then

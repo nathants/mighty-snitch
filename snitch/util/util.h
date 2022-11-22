@@ -1,5 +1,6 @@
 #pragma once
 
+#include <netinet/in.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -90,3 +91,9 @@ int to_hex(const unsigned char *buf, int size, char *dstbuf, int dstbufsize) {
         dst = realloc(dst, size);                                       \
         ASSERT(dst != NULL, "fatal: failed to reallocate memory\n");    \
     } while(0)
+
+void ntoa(struct in_addr in, char *buf, int size) {
+    ASSERT(size >= 18, "bad size: %d\n", size);
+    unsigned char *bytes = (unsigned char *) &in;
+    snprintf(buf, 18, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);
+}

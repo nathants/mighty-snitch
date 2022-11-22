@@ -63,8 +63,8 @@ int dns_parse(unsigned char *r, int rlen, int (*callback)(unsigned char *, int, 
 
 typedef struct packet_s {
     char proto[5];
-    char saddr[15];
-    char daddr[15];
+    char saddr[18];
+    char daddr[18];
     int sport;
     int dport;
     int offset;
@@ -79,8 +79,8 @@ int parse_ipv4(unsigned char *buf, int size, packet_t *p) {
         return -1;
     if (ip->version != 4)
         return -1;
-    strcpy(p->saddr, inet_ntoa(*(struct in_addr*)&ip->saddr));
-    strcpy(p->daddr, inet_ntoa(*(struct in_addr*)&ip->daddr));
+    ntoa(*(struct in_addr*)&ip->saddr, p->saddr, sizeof(p->saddr));
+    ntoa(*(struct in_addr*)&ip->daddr, p->daddr, sizeof(p->daddr));
     switch (ip->protocol) {
     case IPPROTO_ICMP:
         sprintf(p->proto, "icmp");
