@@ -646,6 +646,25 @@ void *loop_netlink(void *vargp) {
         // we use newlines as a field separator, so sanitize all newlines
         NEWLINES_TO_SPACES(e->cmdline);
 
+        // sanitize cmdline since it will be a shell argument
+        for (int i = 0; i < sizeof(e->cmdline); i++) {
+            if (e->cmdline[i] == '\'' ||
+                e->cmdline[i] == '"' ||
+                e->cmdline[i] == ';' ||
+                e->cmdline[i] == '|' ||
+                e->cmdline[i] == '&' ||
+                e->cmdline[i] == '>' ||
+                e->cmdline[i] == '<' ||
+                e->cmdline[i] == '(' ||
+                e->cmdline[i] == ')' ||
+                e->cmdline[i] == '{' ||
+                e->cmdline[i] == '}' ||
+                e->cmdline[i] == '$')
+            {
+                e->cmdline[i] = '_';
+            }
+        }
+
         // resolve dns
         resolve_dns(e);
 
