@@ -5,7 +5,7 @@
 
 _flavor="postmarketos-qcom-sdm845"
 pkgname=linux-$_flavor
-pkgver=6.1.0_rc3
+pkgver=6.1.0_rc4
 pkgrel=0
 pkgdesc="Mainline Kernel fork for SDM845 devices"
 arch="aarch64"
@@ -19,7 +19,7 @@ makedepends="bash bison findutils flex installkernel openssl-dev perl"
 depends="libnetfilter_queue-dev foot gcc musl-dev linux-headers py3-blessed py3-pip coreutils xhost procps bash"
 
 _config="config-$_flavor.$arch"
-_tag="sdm845-6.1.0_rc3"
+_tag="sdm845-6.1.0_rc4"
 
 # Source
 source="
@@ -60,7 +60,7 @@ package() {
 }
 
 sha512sums="
-a4096863f06d00edba6af76f89ea24047badba5d1d1363ba31701dd1088aab34c470a5552b8b3db4cb5d21065496ccac9aa59c05e4d15561d4cfb03706d8962e  linux-sdm845-6.1.0_rc3.tar.gz
+f120f2214143b19ded041d1412c4926cdcbda138343bdc59fe515726cff5a2fe2c29a9754071ebde909aad440abdc581c23606fd235d4ab1f2f56bb6ee9aa6ad  linux-sdm845-6.1.0_rc4.tar.gz
 910b1b58bc505efe95a1cd37bb74380f02b863d036a3040fac9995cb2717fcc007dfd75d3edc0dab2be7852292c6f2441a369971ad2001fc0f4e4082e5790175  0001-snitch.patch
 7fa85bcf695256d0d1fb910c50ce4c28688144e8614e83551259df9c91180c6f7cd3f4e700a89caf74a6b2a306fa4cb515ce6ebf9fc570e954e1320519c18765  config-postmarketos-qcom-sdm845.aarch64
 "
