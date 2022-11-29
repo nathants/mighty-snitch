@@ -294,10 +294,10 @@ index 000000000..7ba274106
 +#endif /** HASHTABLE_H */
 diff --git a/security/snitch/snitch.c b/security/snitch/snitch.c
 new file mode 100644
-index 000000000..ae3af5558
+index 000000000..cc29c5175
 --- /dev/null
 +++ b/security/snitch/snitch.c
-@@ -0,0 +1,333 @@
+@@ -0,0 +1,345 @@
 +/*
 + * Copyright (C) 2019  Argus Cyber Security Ltd, Tel Aviv.
 + * Copyright (C) 2022-present  Nathan Todd-Stone <me@nathants.com>
@@ -355,6 +355,8 @@ index 000000000..ae3af5558
 +
 +DECLARE_WAIT_QUEUE_HEAD(wait_queue_responses);
 +
++spinlock_t netlink_lock;
++
 +#define NETLINK_USER 31
 +
 +#define ALLOW 0
@@ -381,10 +383,12 @@ index 000000000..ae3af5558
 +}
 +
 +void netlink_recv(struct sk_buff *skb) {
++    spin_lock_bh(&netlink_lock);
 +    struct nlmsghdr *nlh = (struct nlmsghdr*)skb->data;
 +    int size = nlh->nlmsg_len - NLMSG_HDRLEN;
 +    if (size < sizeof(int) * 2) {
 +        print("bad netlink message size: %d", size);
++        spin_unlock_bh(&netlink_lock);
 +        return;
 +    }
 +    int id = *(int*)nlmsg_data(nlh);
@@ -403,18 +407,25 @@ index 000000000..ae3af5558
 +            print("err on hashtable set: %d", res);
 +        }
 +    }
++    spin_unlock_bh(&netlink_lock);
 +}
 +
 +int netlink_send(const char *msg, int msg_size) {
++    spin_lock_bh(&netlink_lock);
 +    struct sk_buff *skb_out = nlmsg_new(msg_size, 0);
-+    if (!skb_out)
++    if (!skb_out) {
++        spin_unlock_bh(&netlink_lock);
 +        return -1;
++    }
 +    struct nlmsghdr *nlh = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, msg_size, 0);
 +    NETLINK_CB(skb_out).dst_group = 0;
 +    memcpy(nlmsg_data(nlh), msg, msg_size);
 +    int res = nlmsg_unicast(nl_sk, skb_out, user_pid);
-+    if (res < 0)
++    if (res < 0) {
++        spin_unlock_bh(&netlink_lock);
 +        return -1;
++    }
++    spin_unlock_bh(&netlink_lock);
 +    return 0;
 +}
 +
@@ -607,6 +618,7 @@ index 000000000..ae3af5558
 +static int __init snitch_security_init(void) {
 +    print("security_initcall start");
 +    user_pid = 0;
++    spin_lock_init(&netlink_lock);
 +    hashtable_init(&hashtable_responses);
 +    security_add_hooks(snitch_ops, ARRAY_SIZE(snitch_ops), "snitch");
 +    print("security_initcall finished successfully");
