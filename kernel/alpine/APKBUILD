@@ -2,8 +2,8 @@ _flavor=edge
 pkgname=linux-${_flavor}
 pkgver=6.0.10
 case $pkgver in
-	*.*.*)	_kernver=${pkgver%.*};;
-	*.*) _kernver=$pkgver;;
+    *.*.*)    _kernver=${pkgver%.*};;
+    *.*) _kernver=$pkgver;;
 esac
 pkgrel=1
 pkgdesc="Linux latest stable kernel"
@@ -11,7 +11,7 @@ url="https://www.kernel.org"
 depends="initramfs-generator py3-blessed py3-pip coreutils musl-dev gcc st libnetfilter_queue-dev linux-headers"
 _depends_dev="perl gmp-dev elfutils-dev bash flex bison"
 makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any
-	openssl-dev diffutils findutils xz"
+    openssl-dev diffutils findutils xz"
 options="!strip !check" # no tests
 _config=${config:-config-edge.${CARCH}}
 install=
@@ -19,16 +19,16 @@ install=
 subpackages="$pkgname-dev:_dev:$CBUILD_ARCH"
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz"
 case $pkgver in
-	*.*.0)	source="$source";;
-	*.*.*)	source="$source
-	https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/patch-$pkgver.xz" ;;
+    *.*.0)    source="$source";;
+    *.*.*)    source="$source
+    https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/patch-$pkgver.xz" ;;
 esac
 
-	source="$source
+    source="$source
     0001-snitch.patch
-	config-edge.aarch64
-	config-edge.x86_64
-	"
+    config-edge.aarch64
+    config-edge.x86_64
+    "
 
 builddir="$srcdir/linux-${_kernver}"
 arch="aarch64 x86_64"
@@ -36,16 +36,16 @@ license="GPL-2.0"
 
 _flavors=
 for _i in $source; do
-	case $_i in
-	config-*.$CARCH)
-		_f=${_i%.$CARCH}
-		_f=${_f#config-}
-		_flavors="$_flavors ${_f}"
-		if [ "linux-$_f" != "$pkgname" ]; then
-			subpackages="$subpackages linux-${_f}::$CBUILD_ARCH linux-${_f}-dev:_dev:$CBUILD_ARCH"
-		fi
-		;;
-	esac
+    case $_i in
+    config-*.$CARCH)
+        _f=${_i%.$CARCH}
+        _f=${_f#config-}
+        _flavors="$_flavors ${_f}"
+        if [ "linux-$_f" != "$pkgname" ]; then
+            subpackages="$subpackages linux-${_f}::$CBUILD_ARCH linux-${_f}-dev:_dev:$CBUILD_ARCH"
+        fi
+        ;;
+    esac
 done
 
 _carch=${CARCH}
@@ -54,143 +54,143 @@ aarch64*) _carch="arm64" ;;
 esac
 
 prepare() {
-	local _patch_failed=
+    local _patch_failed=
   cd $builddir
-	case $pkgver in
-		*.*.0);;
-		*)
-		msg "Applying patch-$pkgver.xz"
-		unxz -c < "$srcdir"/patch-$pkgver.xz | patch -p1 -N ;;
-	esac
+    case $pkgver in
+        *.*.0);;
+        *)
+        msg "Applying patch-$pkgver.xz"
+        unxz -c < "$srcdir"/patch-$pkgver.xz | patch -p1 -N ;;
+    esac
 
-	# first apply patches in specified order
-	for i in $source; do
-		case $i in
-		*.patch)
-			msg "Applying $i..."
-			if ! patch -s -p1 -N -i "$srcdir"/$i; then
-				echo $i >>failed
-				_patch_failed=1
-			fi
-			;;
-		esac
-	done
+    # first apply patches in specified order
+    for i in $source; do
+        case $i in
+        *.patch)
+            msg "Applying $i..."
+            if ! patch -s -p1 -N -i "$srcdir"/$i; then
+                echo $i >>failed
+                _patch_failed=1
+            fi
+            ;;
+        esac
+    done
 
-	if ! [ -z "$_patch_failed" ]; then
-		error "The following patches failed:"
-		cat failed
-		return 1
-	fi
+    if ! [ -z "$_patch_failed" ]; then
+        error "The following patches failed:"
+        cat failed
+        return 1
+    fi
 
-	# remove localversion from patch if any
-	rm -f localversion*
-	oldconfig
+    # remove localversion from patch if any
+    rm -f localversion*
+    oldconfig
 }
 
 oldconfig() {
-	for i in $_flavors; do
-		local _config=config-$i.${CARCH}
-		mkdir -p "$builddir"
-		echo "-$pkgrel-$i" > "$builddir"/localversion-alpine \
-			|| return 1
+    for i in $_flavors; do
+        local _config=config-$i.${CARCH}
+        mkdir -p "$builddir"
+        echo "-$pkgrel-$i" > "$builddir"/localversion-alpine \
+            || return 1
 
-		cp "$srcdir"/$_config "$builddir"/.config
-		make -C $builddir \
-			O="$builddir" \
-			ARCH="$_carch" \
-			listnewconfig oldconfig
-	done
+        cp "$srcdir"/$_config "$builddir"/.config
+        make -C $builddir \
+            O="$builddir" \
+            ARCH="$_carch" \
+            listnewconfig oldconfig
+    done
 }
 
 build() {
-	unset LDFLAGS
-	export KBUILD_BUILD_TIMESTAMP=""
+    unset LDFLAGS
+    export KBUILD_BUILD_TIMESTAMP=""
     export CCACHE_DIR="/tmp/ccache"
     export CCACHE_SLOPPINESS=locale,time_macros
     mkdir -p $CCACHE_DIR
-	for i in $_flavors; do
-		cd "$builddir"
-		make ARCH="$_carch" KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Snitch"
-	done
+    for i in $_flavors; do
+        cd "$builddir"
+        make ARCH="$_carch" KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Snitch"
+    done
 }
 
 _package() {
-	local _buildflavor="$1" _outdir="$2"
-	local _abi_release=${pkgver}-${pkgrel}-${_buildflavor}
-	export KBUILD_BUILD_TIMESTAMP=""
+    local _buildflavor="$1" _outdir="$2"
+    local _abi_release=${pkgver}-${pkgrel}-${_buildflavor}
+    export KBUILD_BUILD_TIMESTAMP=""
 
-	cd "$builddir"
-	# modules_install seems to regenerate a defect Modules.symvers on s390x. Work
-	# around it by backing it up and restore it after modules_install
-	cp Module.symvers Module.symvers.backup
+    cd "$builddir"
+    # modules_install seems to regenerate a defect Modules.symvers on s390x. Work
+    # around it by backing it up and restore it after modules_install
+    cp Module.symvers Module.symvers.backup
 
-	mkdir -p "$_outdir"/boot "$_outdir"/lib/modules
+    mkdir -p "$_outdir"/boot "$_outdir"/lib/modules
 
-	local _install
-	case "$CARCH" in
-		aarch64) _install="zinstall dtbs_install";;
-		*) _install=install;;
-	esac
+    local _install
+    case "$CARCH" in
+        aarch64) _install="zinstall dtbs_install";;
+        *) _install=install;;
+    esac
 
-	make -j1 modules_install $_install \
-		ARCH="$_carch" \
-		INSTALL_MOD_PATH="$_outdir" \
-		INSTALL_PATH="$_outdir"/boot \
-		INSTALL_DTBS_PATH="$_outdir/boot/dtbs-$_buildflavor"
+    make -j1 modules_install $_install \
+        ARCH="$_carch" \
+        INSTALL_MOD_PATH="$_outdir" \
+        INSTALL_PATH="$_outdir"/boot \
+        INSTALL_DTBS_PATH="$_outdir/boot/dtbs-$_buildflavor"
 
-	cp Module.symvers.backup Module.symvers
+    cp Module.symvers.backup Module.symvers
 
-	rm -f "$_outdir"/lib/modules/${_abi_release}/build \
-		"$_outdir"/lib/modules/${_abi_release}/source
-	rm -rf "$_outdir"/lib/firmware
+    rm -f "$_outdir"/lib/modules/${_abi_release}/build \
+        "$_outdir"/lib/modules/${_abi_release}/source
+    rm -rf "$_outdir"/lib/firmware
 
-	install -D -m644 include/config/kernel.release \
-		"$_outdir"/usr/share/kernel/$_buildflavor/kernel.release
+    install -D -m644 include/config/kernel.release \
+        "$_outdir"/usr/share/kernel/$_buildflavor/kernel.release
 }
 
 # main flavor installs in $pkgdir
 package() {
-	depends="$depends linux-firmware-any"
+    depends="$depends linux-firmware-any"
 
-	_package edge "$pkgdir"
+    _package edge "$pkgdir"
 }
 
 _dev() {
 
-	local _flavor=$(echo $subpkgname | sed -E 's/(^linux-|-dev$)//g')
-	local _abi_release=${pkgver}-${pkgrel}-$_flavor
-	# copy the only the parts that we really need for build 3rd party
-	# kernel modules and install those as /usr/src/linux-headers,
-	# simlar to what ubuntu does
-	#
-	# this way you dont need to install the 300-400 kernel sources to
-	# build a tiny kernel module
-	#
-	pkgdesc="Headers and script for third party modules for $_flavor kernel"
-	depends="$_depends_dev"
-	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
-	export KBUILD_BUILD_TIMESTAMP=""
+    local _flavor=$(echo $subpkgname | sed -E 's/(^linux-|-dev$)//g')
+    local _abi_release=${pkgver}-${pkgrel}-$_flavor
+    # copy the only the parts that we really need for build 3rd party
+    # kernel modules and install those as /usr/src/linux-headers,
+    # simlar to what ubuntu does
+    #
+    # this way you dont need to install the 300-400 kernel sources to
+    # build a tiny kernel module
+    #
+    pkgdesc="Headers and script for third party modules for $_flavor kernel"
+    depends="$_depends_dev"
+    local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
+    export KBUILD_BUILD_TIMESTAMP=""
 
-	# first we import config, run prepare to set up for building
-	# external modules, and create the scripts
-	mkdir -p "$dir"
-	cp "$srcdir"/config-$_flavor.${CARCH} "$dir"/.config
-	echo "-$pkgrel-$_flavor" > "$dir"/localversion-alpine
-	cd $builddir
+    # first we import config, run prepare to set up for building
+    # external modules, and create the scripts
+    mkdir -p "$dir"
+    cp "$srcdir"/config-$_flavor.${CARCH} "$dir"/.config
+    echo "-$pkgrel-$_flavor" > "$dir"/localversion-alpine
+    cd $builddir
 
   echo "Installing headers..."
-	case "$_carch" in
-	x86_64)
-		_carch="x86"
-		install -Dt "${dir}/tools/objtool" $builddir/tools/objtool/objtool
-		;;
-	esac
+    case "$_carch" in
+    x86_64)
+        _carch="x86"
+        install -Dt "${dir}/tools/objtool" $builddir/tools/objtool/objtool
+        ;;
+    esac
   cp -t "$dir" -a $builddir/include
 
   install -Dt "${dir}" -m644 $builddir/Makefile
   install -Dt "${dir}" -m644 $builddir/Module.symvers
   install -Dt "${dir}" -m644 $builddir/System.map
-	cp -t "$dir" -a $builddir/scripts
+    cp -t "$dir" -a $builddir/scripts
 
 
   install -Dt "${dir}/arch/${_carch}" -m644 $builddir/arch/${_carch}/Makefile
@@ -217,7 +217,7 @@ _dev() {
   echo "Removing unneeded architectures..."
   local arch
   for arch in "$dir"/arch/*/; do
-		case $(basename "$arch") in $_carch) continue ;; esac
+        case $(basename "$arch") in $_carch) continue ;; esac
     echo "Removing $(basename "$arch")"
     rm -r "$arch"
   done
@@ -250,9 +250,9 @@ _dev() {
   strip -v $STRIP_STATIC "$builddir/vmlinux"
 
   echo "Adding symlink..."
-	mkdir -p "$subpkgdir"/lib/modules/${_abi_release}
-	ln -sf /usr/src/linux-headers-${_abi_release} \
-		"$subpkgdir"/lib/modules/${_abi_release}/build
+    mkdir -p "$subpkgdir"/lib/modules/${_abi_release}
+    ln -sf /usr/src/linux-headers-${_abi_release} \
+        "$subpkgdir"/lib/modules/${_abi_release}/build
 }
 
 sha512sums="

@@ -43,30 +43,30 @@ int to_hex(const unsigned char *buf, int size, char *dstbuf, int dstbufsize) {
 #define DENY   1
 
 #define NEWLINES_TO_SPACES(buf)                 \
-	for (int i = 0; i < sizeof(buf); i++) {		\
-		if (buf[i] == '\n') {					\
-			buf[i] = ' ';						\
-		}										\
-	}
+    for (int i = 0; i < sizeof(buf); i++) {        \
+        if (buf[i] == '\n') {                    \
+            buf[i] = ' ';                        \
+        }                                        \
+    }
 
-#define TABS_TO_SPACES(buf)						\
-	for (int i = 0; i < sizeof(buf); i++) {		\
-		if (buf[i] == '\t') {					\
-			buf[i] = ' ';						\
-		}										\
-	}
+#define TABS_TO_SPACES(buf)                        \
+    for (int i = 0; i < sizeof(buf); i++) {        \
+        if (buf[i] == '\t') {                    \
+            buf[i] = ' ';                        \
+        }                                        \
+    }
 
-#define ZEROS_TO_TABS(buf)						\
-	for (int i = 0; i < sizeof(buf); i++) {		\
-		if (buf[i] == 0) {						\
-			if (i > 0 && buf[i - 1] == '\t') {	\
-				buf[i - 1] = 0;					\
-				break;							\
-			} else {							\
-				buf[i] = '\t';					\
-			}									\
-		}										\
-	}
+#define ZEROS_TO_TABS(buf)                        \
+    for (int i = 0; i < sizeof(buf); i++) {        \
+        if (buf[i] == 0) {                        \
+            if (i > 0 && buf[i - 1] == '\t') {    \
+                buf[i - 1] = 0;                    \
+                break;                            \
+            } else {                            \
+                buf[i] = '\t';                    \
+            }                                    \
+        }                                        \
+    }
 
 #define LOG(args...) fprintf(stdout, ##args);
 

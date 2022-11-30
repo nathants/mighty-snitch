@@ -23,12 +23,12 @@ char home[1024] = {0};
 char rules_file[1024] = {0};
 
 typedef struct result_s {
-	i32 id;
-	i32 response;
+    i32 id;
+    i32 response;
 } result_t;
 
 typedef struct event_s {
-	i32 id;
+    i32 id;
     i32 pid;
     char type;
     char namebuf[24];

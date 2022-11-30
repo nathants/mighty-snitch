@@ -23,17 +23,17 @@
 #define RR_CNAME 5
 
 int dns_parse(unsigned char *r, int rlen, int (*callback)(unsigned char *, int, const void *, int, const void *)) { // based on musl @ 4100279825c17807bdabf1c128ba4e49a1dea406
-	int qdcount, ancount;
-	unsigned char *p;
-	unsigned char *qname;
-	int len;
-	if (rlen<12) return -1;
-	if ((r[3]&15)) return 0;
-	p = r+12;
-	qdcount = r[4]*256 + r[5];
-	ancount = r[6]*256 + r[7];
-	if (qdcount+ancount > 64) return -1;
-	while (qdcount--) {
+    int qdcount, ancount;
+    unsigned char *p;
+    unsigned char *qname;
+    int len;
+    if (rlen<12) return -1;
+    if ((r[3]&15)) return 0;
+    p = r+12;
+    qdcount = r[4]*256 + r[5];
+    ancount = r[6]*256 + r[7];
+    if (qdcount+ancount > 64) return -1;
+    while (qdcount--) {
         int qoffset = 0; // start change to musl code. keep a pointer to the qname and pass it to the callback.
         while (1) {
             if (qoffset > rlen - (p-r)) return -1;
@@ -43,22 +43,22 @@ int dns_parse(unsigned char *r, int rlen, int (*callback)(unsigned char *, int, 
             qoffset += size + 1;
         }
         qname = p + 1; // end change to musl code.
-		while (p-r < rlen && *p-1U < 127) p++;
-		if (*p>193 || (*p==193 && p[1]>254) || p>r+rlen-6)
-			return -1;
-		p += 5 + !!*p;
-	}
-	while (ancount--) {
-		while (p-r < rlen && *p-1U < 127) p++;
-		if (*p>193 || (*p==193 && p[1]>254) || p>r+rlen-6)
-			return -1;
-		p += 1 + !!*p;
-		len = p[8]*256 + p[9];
-		if (p+len > r+rlen) return -1;
-		if (callback(qname, p[1], p+10, len, r) < 0) return -1;
-		p += 10 + len;
-	}
-	return 0;
+        while (p-r < rlen && *p-1U < 127) p++;
+        if (*p>193 || (*p==193 && p[1]>254) || p>r+rlen-6)
+            return -1;
+        p += 5 + !!*p;
+    }
+    while (ancount--) {
+        while (p-r < rlen && *p-1U < 127) p++;
+        if (*p>193 || (*p==193 && p[1]>254) || p>r+rlen-6)
+            return -1;
+        p += 1 + !!*p;
+        len = p[8]*256 + p[9];
+        if (p+len > r+rlen) return -1;
+        if (callback(qname, p[1], p+10, len, r) < 0) return -1;
+        p += 10 + len;
+    }
+    return 0;
 }
 
 typedef struct packet_s {
@@ -113,10 +113,10 @@ int parse_ipv4(unsigned char *buf, int size, packet_t *p) {
 char *conf_content =
     "flush ruleset\n"
     "table ip snitch {\n"
-    "	chain inbound {\n"
-    "		type filter hook input priority filter; policy accept;\n"
-    "		udp sport 53 counter queue num 0 bypass\n"
-    "	}\n"
+    "    chain inbound {\n"
+    "        type filter hook input priority filter; policy accept;\n"
+    "        udp sport 53 counter queue num 0 bypass\n"
+    "    }\n"
     "}\n";
 
 #define CONF_FILE "/tmp/nftables.conf"

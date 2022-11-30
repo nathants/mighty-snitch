@@ -13,8 +13,8 @@ _carch="arm64"
 url="https://gitlab.com/sdm845-mainline/linux"
 license="GPL-2.0-only"
 options="!strip !check !tracedeps
-	pmb:cross-native
-	pmb:kconfigcheck-community"
+    pmb:cross-native
+    pmb:kconfigcheck-community"
 makedepends="bash bison findutils flex installkernel openssl-dev perl"
 depends="libnetfilter_queue-dev foot gcc musl-dev linux-headers py3-blessed py3-pip coreutils xhost procps bash"
 
@@ -23,15 +23,15 @@ _tag="sdm845-6.1.0_rc4"
 
 # Source
 source="
-	linux-$_tag.tar.gz::https://gitlab.com/sdm845-mainline/linux/-/archive/$_tag/linux-$_tag.tar.gz
+    linux-$_tag.tar.gz::https://gitlab.com/sdm845-mainline/linux/-/archive/$_tag/linux-$_tag.tar.gz
     0001-snitch.patch
-	$_config
+    $_config
 "
 builddir="$srcdir/linux-$_tag"
 
 prepare() {
-	default_prepare
-	cp "$srcdir/config-$_flavor.$arch" .config
+    default_prepare
+    cp "$srcdir/config-$_flavor.$arch" .config
     cd $builddir
     if [ 0 = $(find -name snitch.c | wc -l) ]; then
         patch -s -p1 -N -i $srcdir/0001-snitch.patch # the triple paths with APKBUILD are probably causing this. only patch once
@@ -39,24 +39,24 @@ prepare() {
 }
 
 build() {
-	unset LDFLAGS
-	make ARCH="$_carch" CC="${CC:-gcc}" KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-${_flavor}-Snitch"
+    unset LDFLAGS
+    make ARCH="$_carch" CC="${CC:-gcc}" KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-${_flavor}-Snitch"
 }
 
 package() {
-	install -Dm644 "$builddir/arch/$_carch/boot/Image.gz" \
-		"$pkgdir/boot/vmlinuz"
+    install -Dm644 "$builddir/arch/$_carch/boot/Image.gz" \
+        "$pkgdir/boot/vmlinuz"
 
-	make modules_install dtbs_install \
-		ARCH="$_carch" \
-		INSTALL_PATH="$pkgdir"/boot/ \
-		INSTALL_MOD_PATH="$pkgdir" \
-		INSTALL_MOD_STRIP=1 \
-		INSTALL_DTBS_PATH="$pkgdir"/boot/dtbs
-	rm -f "$pkgdir"/lib/modules/*/build "$pkgdir"/lib/modules/*/source
+    make modules_install dtbs_install \
+        ARCH="$_carch" \
+        INSTALL_PATH="$pkgdir"/boot/ \
+        INSTALL_MOD_PATH="$pkgdir" \
+        INSTALL_MOD_STRIP=1 \
+        INSTALL_DTBS_PATH="$pkgdir"/boot/dtbs
+    rm -f "$pkgdir"/lib/modules/*/build "$pkgdir"/lib/modules/*/source
 
-	install -D "$builddir"/include/config/kernel.release \
-		"$pkgdir"/usr/share/kernel/$_flavor/kernel.release
+    install -D "$builddir"/include/config/kernel.release \
+        "$pkgdir"/usr/share/kernel/$_flavor/kernel.release
 }
 
 sha512sums="

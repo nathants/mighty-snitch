@@ -294,7 +294,7 @@ index 000000000..7ba274106
 +#endif /** HASHTABLE_H */
 diff --git a/security/snitch/snitch.c b/security/snitch/snitch.c
 new file mode 100644
-index 000000000..cc29c5175
+index 000000000..23dd209df
 --- /dev/null
 +++ b/security/snitch/snitch.c
 @@ -0,0 +1,345 @@
@@ -438,8 +438,8 @@ index 000000000..cc29c5175
 +}
 +
 +#define SNITCH_INIT(name)                                                                                                                                                           \
-+	int pid = current->pid;                                                                                                                                                         \
-+	int tgid = current->tgid;                                                                                                                                                       \
++    int pid = current->pid;                                                                                                                                                         \
++    int tgid = current->tgid;                                                                                                                                                       \
 +    int id = atomic_fetch_inc(&counter);                                                                                                                                            \
 +    int size = 0;                                                                                                                                                                   \
 +    char type = 0;                                                                                                                                                                  \
