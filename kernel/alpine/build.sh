@@ -5,6 +5,7 @@ set -xeuo pipefail
 
 cd $(dirname $0)
 
+spot=${SPOT:-lowestPrice}
 s3_cache_bucket=$MIGHTY_SNITCH_S3_BUCKET
 
 alpine=alpine-3.16.2
@@ -39,7 +40,7 @@ deploy() {
              -g 32 \
              -t $type \
              -e \
-             --spot lowestPrice \
+             --spot $spot \
              --seconds-timeout $((60*$timeout_minutes))
         time libaws ec2-wait-ssh $name
 

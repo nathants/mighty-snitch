@@ -5,6 +5,8 @@ set -xeou pipefail
 
 cd $(dirname $0)
 
+spot=${SPOT:-lowestPrice}
+
 name=might-snitch-alpine-sdm845
 alpine=alpine-3.16.2
 type=c6i.8xlarge
@@ -29,7 +31,7 @@ id=$(libaws ec2-new \
             -k $key \
             --sg $sg \
             --vpc $vpc \
-            --spot lowestPrice \
+            --spot $spot \
             -t $type \
             -a $alpine \
             --gigs 32 \
