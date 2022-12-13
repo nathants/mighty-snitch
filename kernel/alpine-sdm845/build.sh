@@ -8,7 +8,7 @@ cd $(dirname $0)
 spot=${SPOT:-lowestPrice}
 
 name=might-snitch-alpine-sdm845
-alpine=alpine-3.16.2
+alpine=alpine-3.17.0
 type=c6i.8xlarge
 key=relay
 vpc=relay

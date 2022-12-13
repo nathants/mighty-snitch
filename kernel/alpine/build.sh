@@ -8,7 +8,7 @@ cd $(dirname $0)
 spot=${SPOT:-lowestPrice}
 s3_cache_bucket=$MIGHTY_SNITCH_S3_BUCKET
 
-alpine=alpine-3.16.2
+alpine=alpine-3.17.0
 key=relay
 vpc=relay
  sg=relay
