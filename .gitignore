@@ -1,3 +1,6 @@
 snitch/snitch
 *.egg-info
 src/
+pkg/
+archlinux-linux
+linux-*

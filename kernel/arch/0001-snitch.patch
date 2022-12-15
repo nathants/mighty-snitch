@@ -1,0 +1,647 @@
+diff --git a/.clang-format b/.clang-format
+index 8d01225bf..b3bcf786c 100644
+--- a/.clang-format
++++ b/.clang-format
+@@ -17,33 +17,17 @@ AlignEscapedNewlines: Left
+ AlignOperands: true
+ AlignTrailingComments: false
+ AllowAllParametersOfDeclarationOnNextLine: false
+-AllowShortBlocksOnASingleLine: false
+-AllowShortCaseLabelsOnASingleLine: false
+-AllowShortFunctionsOnASingleLine: None
+-AllowShortIfStatementsOnASingleLine: false
+-AllowShortLoopsOnASingleLine: false
++AllowShortBlocksOnASingleLine: true
++AllowShortCaseLabelsOnASingleLine: true
++AllowShortFunctionsOnASingleLine: true
++AllowShortIfStatementsOnASingleLine: true
++AllowShortLoopsOnASingleLine: true
+ AlwaysBreakAfterDefinitionReturnType: None
+ AlwaysBreakAfterReturnType: None
+ AlwaysBreakBeforeMultilineStrings: false
+ AlwaysBreakTemplateDeclarations: false
+ BinPackArguments: true
+ BinPackParameters: true
+-BraceWrapping:
+-  AfterClass: false
+-  AfterControlStatement: false
+-  AfterEnum: false
+-  AfterFunction: true
+-  AfterNamespace: true
+-  AfterObjCDeclaration: false
+-  AfterStruct: false
+-  AfterUnion: false
+-  AfterExternBlock: false
+-  BeforeCatch: false
+-  BeforeElse: false
+-  IndentBraces: false
+-  SplitEmptyFunction: true
+-  SplitEmptyRecord: true
+-  SplitEmptyNamespace: true
+ BreakBeforeBinaryOperators: None
+ BreakBeforeBraces: Custom
+ BreakBeforeInheritanceComma: false
+@@ -52,7 +36,7 @@ BreakConstructorInitializersBeforeComma: false
+ BreakConstructorInitializers: BeforeComma
+ BreakAfterJavaFieldAnnotations: false
+ BreakStringLiterals: false
+-ColumnLimit: 80
++ColumnLimit: 0
+ CommentPragmas: '^ IWYU pragma:'
+ CompactNamespaces: false
+ ConstructorInitializerAllOnOneLineOrOnePerLine: false
+@@ -651,15 +635,6 @@ ObjCBlockIndentWidth: 8
+ ObjCSpaceAfterProperty: true
+ ObjCSpaceBeforeProtocolList: true
+ 
+-# Taken from git's rules
+-PenaltyBreakAssignment: 10
+-PenaltyBreakBeforeFirstCallParameter: 30
+-PenaltyBreakComment: 10
+-PenaltyBreakFirstLessLess: 0
+-PenaltyBreakString: 10
+-PenaltyExcessCharacter: 100
+-PenaltyReturnTypeOnItsOwnLine: 60
+-
+ PointerAlignment: Right
+ ReflowComments: false
+ SortIncludes: false
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index 2d7ea5480..a67caf580 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -1094,6 +1094,13 @@ static void __init sld_state_setup(void)
+ 		}
+ 	}
+ 	sld_state = state;
++
++    // TODO why this being anything other than off causes the kernel
++    // to panic sometimes. it would be good to understand and fix this
++    // issue, but since it is only a performance degradation, and
++    // snitch already is a performance degradation, it's probably
++    // fine.
++    sld_state = sld_off;
+ }
+ 
+ static void __init __split_lock_setup(void)
+diff --git a/security/Kconfig b/security/Kconfig
+index e6db09a77..5e4c09f5c 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -203,6 +203,7 @@ source "security/smack/Kconfig"
+ source "security/tomoyo/Kconfig"
+ source "security/apparmor/Kconfig"
+ source "security/loadpin/Kconfig"
++source "security/snitch/Kconfig"
+ source "security/yama/Kconfig"
+ source "security/safesetid/Kconfig"
+ source "security/lockdown/Kconfig"
+@@ -261,4 +262,3 @@ config LSM
+ source "security/Kconfig.hardening"
+ 
+ endmenu
+-
+diff --git a/security/Makefile b/security/Makefile
+index 18121f8f8..31ddf59fe 100644
+--- a/security/Makefile
++++ b/security/Makefile
+@@ -19,6 +19,7 @@ obj-$(CONFIG_SECURITY_TOMOYO)		+= tomoyo/
+ obj-$(CONFIG_SECURITY_APPARMOR)		+= apparmor/
+ obj-$(CONFIG_SECURITY_YAMA)		+= yama/
+ obj-$(CONFIG_SECURITY_LOADPIN)		+= loadpin/
++obj-$(CONFIG_SECURITY_SNITCH)		+= snitch/
+ obj-$(CONFIG_SECURITY_SAFESETID)       += safesetid/
+ obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
+ obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
+diff --git a/security/security.c b/security/security.c
+index 79d82cb6e..1df7a59bf 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -327,14 +327,14 @@ static void __init ordered_lsm_init(void)
+ 	ordered_lsms = kcalloc(LSM_COUNT + 1, sizeof(*ordered_lsms),
+ 				GFP_KERNEL);
+ 
+-	if (chosen_lsm_order) {
+-		if (chosen_major_lsm) {
+-			pr_info("security= is ignored because it is superseded by lsm=\n");
+-			chosen_major_lsm = NULL;
+-		}
+-		ordered_lsm_parse(chosen_lsm_order, "cmdline");
+-	} else
+-		ordered_lsm_parse(builtin_lsm_order, "builtin");
++	/* if (chosen_lsm_order) { */
++	/* 	if (chosen_major_lsm) { */
++	/* 		pr_info("security= is ignored because it is superseded by lsm=\n"); */
++	/* 		chosen_major_lsm = NULL; */
++	/* 	} */
++	/* 	ordered_lsm_parse(chosen_lsm_order, "cmdline"); */
++	/* } else */
++    ordered_lsm_parse(builtin_lsm_order, "builtin");
+ 
+ 	for (lsm = ordered_lsms; *lsm; lsm++)
+ 		prepare_lsm(*lsm);
+diff --git a/security/snitch/Kconfig b/security/snitch/Kconfig
+new file mode 100644
+index 000000000..7fbe23cf6
+--- /dev/null
++++ b/security/snitch/Kconfig
+@@ -0,0 +1,10 @@
++config SECURITY_SNITCH
++	bool "SNITCH"
++	depends on SECURITY && NET
++	select SECURITY_PATH
++	select SECURITYFS
++	select SECURITY_NETWORK
++	default y
++	help
++	  This selects SNITCH
++	  If you are unsure how to answer this question, answer N.
+diff --git a/security/snitch/Makefile b/security/snitch/Makefile
+new file mode 100644
+index 000000000..9305bf5cb
+--- /dev/null
++++ b/security/snitch/Makefile
+@@ -0,0 +1,3 @@
++obj-$(CONFIG_SECURITY_SNITCH) := snitch.o
++
++snitch-y := hashtable.o snitch.o
+diff --git a/security/snitch/hashtable.c b/security/snitch/hashtable.c
+new file mode 100644
+index 000000000..e4fa8522c
+--- /dev/null
++++ b/security/snitch/hashtable.c
+@@ -0,0 +1,78 @@
++#include <linux/slab.h>
++
++#include "hashtable.h"
++
++int hashtable_set(struct hashtable *hashtable, uint32_t key, uint64_t value) {
++    struct hashtable_node *node;
++    if (!hashtable)
++        return -1;
++    hash_for_each_possible(hashtable->table, node, hlist, key) {
++        if (node->key == key) {
++            node->value = value;
++            return 0;
++        }
++    }
++    node = kmalloc(sizeof(*node), GFP_ATOMIC);
++    if (node == NULL) {
++        return -ENOMEM;
++    }
++    node->key = key;
++    node->value = value;
++    hash_add(hashtable->table, &node->hlist, key);
++    return 0;
++}
++
++int hashtable_delete(struct hashtable *hashtable, uint32_t key) {
++    struct hashtable_node *node;
++    if (!hashtable)
++        return -1;
++    hash_for_each_possible(hashtable->table, node, hlist, key) {
++        if (node->key == key) {
++            hash_del(&node->hlist);
++            kfree(node);
++            return 0;
++        }
++    }
++    return -1;
++}
++
++struct hashtable_resp hashtable_get_locking(struct hashtable *hashtable, uint32_t key) {
++    spin_lock_bh(&hashtable->lock);
++    struct hashtable_resp resp = hashtable_get(hashtable, key);
++    spin_unlock_bh(&hashtable->lock);
++    return resp;
++}
++
++struct hashtable_resp hashtable_get(struct hashtable *hashtable, uint32_t key) {
++    struct hashtable_resp resp = {0};
++    struct hashtable_node *node;
++    if (!hashtable) {
++        resp.error = 1;
++        return resp;
++    }
++    hash_for_each_possible(hashtable->table, node, hlist, key) {
++        if (node->key == key) {
++            resp.value = node->value;
++            return resp;
++        }
++    }
++    resp.error = 2;
++    return resp;
++}
++
++void hashtable_free(struct hashtable *hashtable) {
++    int i = 0;
++    struct hashtable_node *node;
++    struct hlist_node *tmp;
++    if (!hashtable)
++        return;
++    hash_for_each_safe(hashtable->table, i, tmp, node, hlist) {
++        hash_del(&node->hlist);
++        kfree(node);
++    }
++}
++
++void hashtable_init(struct hashtable *hashtable) {
++    hash_init(hashtable->table);
++    spin_lock_init(&hashtable->lock);
++}
+diff --git a/security/snitch/hashtable.h b/security/snitch/hashtable.h
+new file mode 100644
+index 000000000..7ba274106
+--- /dev/null
++++ b/security/snitch/hashtable.h
+@@ -0,0 +1,37 @@
++#ifndef HASHTABLE_H
++#define HASHTABLE_H
++
++#include <linux/hashtable.h>
++#include <linux/spinlock.h>
++
++#define HASHTABLE_DEFAULT_SIZE 2048
++
++struct hashtable {
++    DECLARE_HASHTABLE(table, ilog2(HASHTABLE_DEFAULT_SIZE));
++    spinlock_t lock;
++};
++
++struct hashtable_node {
++    uint64_t value;
++    uint32_t key;
++    struct hlist_node hlist;
++};
++
++struct hashtable_resp {
++    uint64_t value;
++    uint8_t error;
++};
++
++struct hashtable_resp hashtable_get_locking(struct hashtable *hashtable, uint32_t key);
++
++struct hashtable_resp hashtable_get(struct hashtable *hashtable, uint32_t key);
++
++int hashtable_delete(struct hashtable *hashtable, uint32_t key);
++
++int hashtable_set(struct hashtable *hashtable, uint32_t key, uint64_t value);
++
++void hashtable_free(struct hashtable *hashtable);
++
++void hashtable_init(struct hashtable *hashtable);
++
++#endif /** HASHTABLE_H */
+diff --git a/security/snitch/snitch.c b/security/snitch/snitch.c
+new file mode 100644
+index 000000000..d34d980d4
+--- /dev/null
++++ b/security/snitch/snitch.c
+@@ -0,0 +1,347 @@
++/*
++ * Copyright (C) 2019  Argus Cyber Security Ltd, Tel Aviv.
++ * Copyright (C) 2022-present  Nathan Todd-Stone <me@nathants.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <linux/atomic.h>
++#include <linux/binfmts.h>
++#include <linux/cred.h>
++#include <linux/delay.h>
++#include <linux/file.h>
++#include <linux/fs.h>
++#include <linux/lsm_hooks.h>
++#include <linux/mman.h>
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/namei.h>
++#include <linux/netlink.h>
++#include <linux/security.h>
++#include <linux/skbuff.h>
++#include <linux/string.h>
++#include <linux/types.h>
++#include <linux/spinlock.h>
++#include <linux/version.h>
++#include <linux/un.h>
++#include <net/sock.h>
++
++#include "hashtable.h"
++
++MODULE_AUTHOR("nathants");
++MODULE_DESCRIPTION("might-snitch");
++MODULE_LICENSE("GPL");
++MODULE_VERSION("1.0");
++
++int user_pid;
++
++struct sock *nl_sk;
++
++atomic_t counter = ATOMIC_INIT(0);
++
++struct hashtable hashtable_responses;
++
++DECLARE_WAIT_QUEUE_HEAD(wait_queue_responses);
++
++spinlock_t netlink_lock;
++
++#define NETLINK_USER 31
++
++#define ALLOW 0
++#define DENY  1
++
++#define print(format, args...) \
++    printk(KERN_INFO "snitch: " format "\n", ##args)
++
++#define NO_USERSPACE() \
++    user_pid == 0
++
++struct file *get_exe_file(struct task_struct *task) {
++    struct file *exe_file = NULL;
++    struct mm_struct *mm;
++    task_lock(task);
++    mm = task->mm;
++    if (mm) {
++        if (!(task->flags & PF_KTHREAD)) {
++            exe_file = get_mm_exe_file(mm);
++        }
++    }
++    task_unlock(task);
++    return exe_file;
++}
++
++void netlink_recv(struct sk_buff *skb) {
++    spin_lock_bh(&netlink_lock);
++    struct nlmsghdr *nlh = (struct nlmsghdr*)skb->data;
++    int size = nlh->nlmsg_len - NLMSG_HDRLEN;
++    if (size < sizeof(int) * 2) {
++        print("bad netlink message size: %d", size);
++        spin_unlock_bh(&netlink_lock);
++        return;
++    }
++    int id = *(int*)nlmsg_data(nlh);
++    int response = *(int*)(nlmsg_data(nlh) + sizeof(int));
++    int pid = nlh->nlmsg_pid;
++    if (NO_USERSPACE() && pid != 0) {
++        print("user started %d", pid);
++        user_pid = pid;
++    } else {
++        spin_lock_bh(&hashtable_responses.lock);
++        int res = hashtable_set(&hashtable_responses, id, response);
++        spin_unlock_bh(&hashtable_responses.lock);
++        if (res == 0) {
++            wake_up(&wait_queue_responses);
++        } else {
++            print("err on hashtable set: %d", res);
++        }
++    }
++    spin_unlock_bh(&netlink_lock);
++}
++
++int netlink_send(const char *msg, int msg_size) {
++    spin_lock_bh(&netlink_lock);
++    struct sk_buff *skb_out = nlmsg_new(msg_size, 0);
++    if (!skb_out) {
++        spin_unlock_bh(&netlink_lock);
++        return -1;
++    }
++    struct nlmsghdr *nlh = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, msg_size, 0);
++    NETLINK_CB(skb_out).dst_group = 0;
++    memcpy(nlmsg_data(nlh), msg, msg_size);
++    int res = nlmsg_unicast(nl_sk, skb_out, user_pid);
++    if (res < 0) {
++        spin_unlock_bh(&netlink_lock);
++        return -1;
++    }
++    spin_unlock_bh(&netlink_lock);
++    return 0;
++}
++
++int __init netlink_init(void) {
++    struct netlink_kernel_cfg cfg = { .input = netlink_recv };
++    nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
++    if (!nl_sk)
++        return -1;
++    return 0;
++}
++
++#define SNITCH_INIT(name)                                                                                                                                                           \
++    int pid = current->pid;                                                                                                                                                         \
++    int tgid = current->tgid;                                                                                                                                                       \
++    int id = atomic_fetch_inc(&counter);                                                                                                                                            \
++    int size = 0;                                                                                                                                                                   \
++    char type = 0;                                                                                                                                                                  \
++    char namebuf[24] = {0};                                                                                                                                                         \
++    snprintf(namebuf, sizeof(namebuf), name);                                                                                                                                       \
++    char tempbuf[256] = {0};                                                                                                                                                        \
++    char *temp = NULL;                                                                                                                                                              \
++    char exebuf[256] = {0};                                                                                                                                                         \
++    char cmdlinebuf[256] = {0};                                                                                                                                                     \
++    char databuf[256] = {0};                                                                                                                                                        \
++    char *head = NULL;
++
++#define SEND_RECV()                                                                                                                                 \
++    char message[sizeof(id) +                                                                                                                       \
++                 sizeof(tgid) + /* tgid is userspace pid */                                                                                         \
++                 sizeof(type) +                                                                                                                     \
++                 sizeof(namebuf) +                                                                                                                  \
++                 sizeof(exebuf) +                                                                                                                   \
++                 sizeof(cmdlinebuf) +                                                                                                               \
++                 sizeof(databuf)] = {0};                                                                                                            \
++    head = message;                                                                                                                                 \
++    size = sizeof(id);         memcpy(head, &id, size);        head += size;                                                                        \
++    size = sizeof(tgid);       memcpy(head, &tgid, size);      head += size;                                                                        \
++    size = sizeof(type);       memcpy(head, &type, size);      head += size;                                                                        \
++    size = sizeof(namebuf);    memcpy(head, namebuf, size);    head += size;                                                                        \
++    size = sizeof(exebuf);     memcpy(head, exebuf, size);     head += size;                                                                        \
++    size = sizeof(cmdlinebuf); memcpy(head, cmdlinebuf, size); head += size;                                                                        \
++    size = sizeof(databuf);    memcpy(head, databuf, size);    head += size;                                                                        \
++    int i = 0;                                                                                                                                      \
++    while (1) {                                                                                                                                     \
++        i++;                                                                                                                                        \
++        if (NO_USERSPACE()) {                                                                                                                       \
++            return DENY;                                                                                                                            \
++        }                                                                                                                                           \
++        int send_res = netlink_send(message, sizeof(message));                                                                                      \
++        if (send_res != 0) {                                                                                                                        \
++            print("send-failed id: %d, attempt: %d, name: %s, exe: %s, cmdline: %s, send_res: %d", id, i, namebuf, exebuf, cmdlinebuf, send_res);   \
++            usleep_range(500, 1000);                                                                                                                \
++            continue;                                                                                                                               \
++        }                                                                                                                                           \
++        if (wait_event_timeout(wait_queue_responses, hashtable_get_locking(&hashtable_responses, id).error == 0, 1 * HZ) != 0) {                    \
++            spin_lock_bh(&hashtable_responses.lock);                                                                                                \
++            int ret = hashtable_get(&hashtable_responses, id).value;                                                                                \
++            hashtable_delete(&hashtable_responses, id);                                                                                             \
++            spin_unlock_bh(&hashtable_responses.lock);                                                                                              \
++            return ret;                                                                                                                             \
++        } else {                                                                                                                                    \
++            /* don't log failure here because a recv failure is expected when waiting for user interaction at the ui prompt */                      \
++            usleep_range(500, 1000);                                                                                                                \
++            continue;                                                                                                                               \
++        }                                                                                                                                           \
++    }
++
++#define READ_CMDLINE(task, buf)                         \
++    if (get_cmdline(task, buf, sizeof(buf) - 1) == 0)   \
++        strcpy(buf, "<missing>");
++
++#define READ_EXE(task, buf)                                                         \
++    struct file *exe_file = get_exe_file(task);                                     \
++    if (exe_file) {                                                                 \
++        memset(tempbuf, 0, sizeof(tempbuf));                                        \
++        temp = d_absolute_path(&exe_file->f_path, tempbuf, sizeof(tempbuf) - 1);    \
++        if (!temp) {                                                                \
++            strcpy(buf, "<path-too-long>");                                         \
++        } else {                                                                    \
++            head = tempbuf;                                                         \
++            size = sizeof(tempbuf) - 1;                                             \
++            while (size > 0) {                                                      \
++                if (head[0] != 0)                                                   \
++                    break;                                                          \
++                size--;                                                             \
++                head++;                                                             \
++            }                                                                       \
++            strncpy(buf, head, size);                                               \
++        }                                                                           \
++    } else {                                                                        \
++        strcpy(buf, "<missing>");                                                   \
++    }
++
++void snitch_task_free(struct task_struct *task) {
++    if (user_pid == task->tgid && user_pid != 0) {
++        print("user exited %d", task->tgid);
++        user_pid = 0;
++    }
++}
++
++int snitch_socket_sendmsg(struct socket *sock, struct msghdr *msg, int _msgsize) {
++    SNITCH_INIT("socket_sendmsg");
++    READ_CMDLINE(current, cmdlinebuf);
++    READ_EXE(current, exebuf);
++    if (msg && msg->msg_namelen > 0) {
++        memcpy(databuf, msg->msg_name, msg->msg_namelen);
++    } else {
++        struct sockaddr_storage remote = {0};
++        int res = sock->ops->getname(sock, (struct sockaddr*)&remote, 2);
++        if (res < 0) {
++            if (strcmp("/usr/bin/dhcpcd", exebuf) == 0)
++                return ALLOW; // why does arch need this?
++            print("exe=%s cmdline=[%s] sendmsg get remote addr failure", exebuf, cmdlinebuf);
++            return DENY;
++        }
++        memcpy(databuf, &remote, sizeof(remote));
++    }
++    if (sock) {
++        type = (char)sock->type;
++    }
++    struct sockaddr *sa = (struct sockaddr*)databuf;
++    if (sa->sa_family == AF_INET6) {
++        // deny ipv6
++        return DENY;
++    } else if (sa->sa_family == AF_INET) {
++        // userspace decides ipv4
++        SEND_RECV();
++    } else {
++        // allow everything else
++        return ALLOW;
++    }
++}
++
++int snitch_socket_recvmsg(struct socket *sock, struct msghdr *msg, int _size, int _flags) {
++    SNITCH_INIT("socket_recvmsg");
++    READ_CMDLINE(current, cmdlinebuf);
++    READ_EXE(current, exebuf);
++    if (msg && msg->msg_namelen > 0) {
++        memcpy(databuf, msg->msg_name, msg->msg_namelen);
++    } else {
++        struct sockaddr_storage local = {0};
++        if (sock->ops->getname(sock, (struct sockaddr*)&local, 0) < 0) {
++            print("exe=%s cmdline=[%s] recvmsg get local addr failure", exebuf, cmdlinebuf);
++            return DENY;
++        }
++        memcpy(databuf, &local, sizeof(local));
++    }
++    if (sock) {
++        type = (char)sock->type;
++    }
++    struct sockaddr *sa = (struct sockaddr*)databuf;
++    if (sa->sa_family == AF_INET6) {
++        // deny ipv6
++        return DENY;
++    } else if (sa->sa_family == AF_INET) {
++        // userspace decides ipv4
++        SEND_RECV();
++    } else {
++        // allow everything else
++        return ALLOW;
++    }
++}
++
++int snitch_uring_override_creds(const struct cred *new) {
++    return DENY;
++}
++
++int snitch_uring_sqpoll(void) {
++    return DENY;
++}
++
++int snitch_uring_cmd(struct io_uring_cmd *ioucmd) {
++    return DENY;
++}
++
++static struct security_hook_list snitch_ops[] __lsm_ro_after_init = {
++
++    // task cleanup
++    LSM_HOOK_INIT(task_free, snitch_task_free),
++
++    // network filtering
++    LSM_HOOK_INIT(socket_recvmsg, snitch_socket_recvmsg),
++    LSM_HOOK_INIT(socket_sendmsg, snitch_socket_sendmsg),
++
++    // disable io_uring since it circumvents security
++    LSM_HOOK_INIT(uring_override_creds, snitch_uring_override_creds),
++    LSM_HOOK_INIT(uring_sqpoll, snitch_uring_sqpoll),
++    LSM_HOOK_INIT(uring_cmd, snitch_uring_cmd),
++
++};
++
++static int __init snitch_security_init(void) {
++    print("security_initcall start");
++    user_pid = 0;
++    spin_lock_init(&netlink_lock);
++    hashtable_init(&hashtable_responses);
++    security_add_hooks(snitch_ops, ARRAY_SIZE(snitch_ops), "snitch");
++    print("security_initcall finished successfully");
++    return 0;
++}
++
++static int __init snitch_late_initcall(void) {
++    int res = netlink_init();
++    if (res)
++        print("late_initcall failed %d", res);
++    print("late_initcall finished successfully");
++    return 0;
++}
++
++int snitch_enabled __lsm_ro_after_init = 1;
++
++DEFINE_LSM(snitch) = {
++    .name = "snitch",
++    .init = snitch_security_init,
++    .flags = LSM_FLAG_EXCLUSIVE,
++    .enabled = &snitch_enabled,
++};
++
++late_initcall(snitch_late_initcall);

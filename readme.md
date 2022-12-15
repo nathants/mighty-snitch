@@ -26,9 +26,9 @@ finally snitch responds to the kernel and the request is allowed or denied.
 
 ## hardware
 
-the primary test environments are [alpine](https://alpinelinux.org/) x86_64 and [postmarketos](https://postmarketos.org/) arm64.
+the primary test environments are [alpine](https://alpinelinux.org/), [arch](https://archlinux.org/), and [postmarketos](https://postmarketos.org/).
 
-the primary test devices are [thinkpad x1](https://www.lenovo.com/us/en/c/laptops/thinkpad/thinkpadx1) and [oneplus 6t](https://www.oneplus.com/6t).
+the primary test devices are [thinkpad x1](https://www.lenovo.com/us/en/c/laptops/thinkpad/thinkpadx1), [rog x670e-i](https://rog.asus.com/motherboards/rog-strix/rog-strix-x670e-i-gaming-wifi-model/), and [oneplus 6t](https://www.oneplus.com/6t).
 
 ## prior art
 
@@ -98,7 +98,7 @@ send  deny  /usr/lib/firefox/firefox  push.services.mozilla.com              443
 send  deny  /usr/lib/firefox/firefox  shavar.services.mozilla.com            443  tcp  /usr/lib/firefox/firefox
 ```
 
-## install x86_64
+## install alpine
 
 copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
 
@@ -114,14 +114,14 @@ sudo reboot
 cd ~
 git clone https://github.com/nathants/mighty-snitch
 
-cd ~/might-snitch/snitch-prompt
+cd ~/mighty-snitch/snitch-prompt
 sudo pip install .
 
 cd ~/mighty-snitch/snitch
 bash snitch.sh
 ```
 
-## install arm64
+## install postmarketos
 
 copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
 
@@ -136,14 +136,36 @@ sudo reboot
 cd ~
 git clone https://github.com/nathants/mighty-snitch
 
-cd ~/might-snitch/snitch-prompt
+cd ~/mighty-snitch/snitch-prompt
 sudo pip install .
 
 cd ~/mighty-snitch/snitch
 bash snitch.sh
 ```
 
-## build on aws and install x86_64
+## install arch
+
+copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
+
+```bash
+cd /tmp
+wget linux-*.zst
+wget linux-docs-*.zst
+wget linux-headers-*.zst
+sudo pacman -U *.zst
+sudo reboot
+
+cd ~
+git clone https://github.com/nathants/mighty-snitch
+
+cd ~/mighty-snitch/snitch-prompt
+sudo pip install .
+
+cd ~/mighty-snitch/snitch
+bash snitch.sh
+```
+
+## build alpine on aws and install
 
 ```bash
 sudo apk add go
@@ -157,7 +179,7 @@ export MIGHTY_SNITCH_PUBKEY_CONTENT=$(cat ~/.ssh/id_ed25519.pub)
 cd ~
 git clone https://github.com/nathants/mighty-snitch
 
-cd ~/might-snitch/kernel/alpine
+cd ~/mighty-snitch/kernel/alpine
 bash build.sh
 sudo mv /tmp/abuild/*.pub /etc/apk/keys/
 sudo apk add /tmp/packages/*/*/*.apk
@@ -170,7 +192,7 @@ cd ~/mighty-snitch/snitch
 bash snitch.sh
 ```
 
-## build on aws and install arm64
+## build alpine on aws and install
 
 ```bash
 
@@ -190,6 +212,23 @@ bash build.sh
 sudo mv /tmp/*.pub /etc/apk/keys/
 sudo apk add /tmp/*.apk
 sudo reboot
+
+cd ~/mighty-snitch/snitch-prompt
+sudo pip install .
+
+cd ~/mighty-snitch/snitch
+bash snitch.sh
+```
+
+## build arch and install
+
+```bash
+cd ~
+git clone https://github.com/nathants/mighty-snitch
+
+cd ~/mighty-snitch/kernel/arch
+makepkg -sCf
+sudo pacman -U *.zst
 
 cd ~/mighty-snitch/snitch-prompt
 sudo pip install .
