@@ -768,12 +768,7 @@ i32 prompt(event_t *e, char *payload, i32 size) {
     }
     char buf[1] = {0};
     while (fread(buf, 1, sizeof(buf), f)) {}
-    i32 res = pclose(f);
-    ZEROS_TO_TABS(inbuf);
-    if (res != 0) {
-        LOG("prompt failure2: deny %d\n", res);
-        return DENY;
-    }
+    pclose(f);
     char outbuf[4096] = {0};
     f = fopen(outfile, "r");
     if (!f) {
