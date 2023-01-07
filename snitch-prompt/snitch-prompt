@@ -10,6 +10,7 @@ import contextlib
 import threading
 import queue
 import re
+import tempfile
 
 _rm_color = re.compile(r'\x1b[^m]*m')
 
@@ -170,24 +171,24 @@ def main():
                         time.sleep(interval)
                     else:
                         if char in ['y', 'n']:
+                            temp = tempfile.mktemp()
                             if char == 'y':
                                 response = 'allow'
                             elif char == 'n':
                                 response = 'deny'
                             if kind == 'send':
-                                with open(outfile, 'w') as f:
+                                with open(temp, 'w') as f:
                                     f.write(f'send\x00{response}\x00{duration}\x00{exe}\x00{addr}\x00{port}\x00{proto}\x00{cmdline}')
-                                sys.exit(0)
                             elif kind == 'recv':
-                                with open(outfile, 'w') as f:
+                                with open(temp, 'w') as f:
                                     f.write(f'recv\x00{response}\x00{duration}\x00{exe}\x00{port}\x00{proto}\x00{cmdline}')
-                                sys.exit(0)
                             elif kind in ['read', 'write', 'exec', 'unknown']:
-                                with open(outfile, 'w') as f:
+                                with open(temp, 'w') as f:
                                     f.write(f'{kind}\x00{response}\x00{duration}\x00{exe}\x00{path}\x00{cmdline}')
-                                sys.exit(0)
                             else:
                                 assert False, f'unknown kind {kind}'
+                            os.rename(temp, outfile)
+                            sys.exit(0)
                         elif char == 'd':
                             if duration == '1-minute':
                                 duration = '24-hour'
