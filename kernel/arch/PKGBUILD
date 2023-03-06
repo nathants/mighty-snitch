@@ -1,8 +1,8 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.2.1.arch1
-_srcname=linux-6.2.1
+pkgver=6.2.2.arch1
+_srcname=linux-6.2.2
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -23,7 +23,7 @@ source=(
     config
     0001-snitch.patch
 )
-sha512sums=('79d3465955dd557dc599fa1c18c7a68699f4febdd7264fe4e223c694e879ef5bb65fff9fad1ec5599f894ad6519bad292efbd5b9990dac3223d843f5c22c65f2'
+sha512sums=('749df066dee0c3e003db47f66be692f12fe57bfa06b90d68394685961764a98a299a08f20587a24cb254fe4881f4849415e47b391d824b35ded2fb67c14ed3e6'
             '12abedf6f57686246a42026ea3702de094986dc23ae0613117b1df4e6e246fc47956f99ae8f4ea463524e7160acac947af11d4a444f82fc28834a5ef49fa0c06'
             '3bea8d6cc6c20c19ac60c23fae7c6eb072ff48bffed7a2c9c2c51078be222e6d69807a8958fbd3133c4b52977fa44c48d2b8ddd2b7b5755223848e76e369f92c')
 
