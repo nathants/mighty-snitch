@@ -1,8 +1,8 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.2.2.arch1
-_srcname=linux-6.2.2
+pkgver=6.2.5.arch1
+_srcname=linux-6.2.5
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -14,7 +14,7 @@ depends=(
 )
 makedepends=(
   bc libelf pahole cpio perl tar xz
-  xmlto python-sphinx python-sphinx_rtd_theme graphviz imagemagick texlive-latexextra
+  xmlto python-sphinx graphviz imagemagick texlive-latexextra
   git
 )
 options=('!strip')
@@ -23,7 +23,7 @@ source=(
     config
     0001-snitch.patch
 )
-sha512sums=('749df066dee0c3e003db47f66be692f12fe57bfa06b90d68394685961764a98a299a08f20587a24cb254fe4881f4849415e47b391d824b35ded2fb67c14ed3e6'
+sha512sums=('72a9adafbdc63cabc42b6cb0a833de70e1784a9b45c47973c57df754e01900b34f9a2fb85f442ee4a7d8bec687f1f87835dc025c37bda6525dd1fbf2290f4e01'
             '12abedf6f57686246a42026ea3702de094986dc23ae0613117b1df4e6e246fc47956f99ae8f4ea463524e7160acac947af11d4a444f82fc28834a5ef49fa0c06'
             '3bea8d6cc6c20c19ac60c23fae7c6eb072ff48bffed7a2c9c2c51078be222e6d69807a8958fbd3133c4b52977fa44c48d2b8ddd2b7b5755223848e76e369f92c')
 
