@@ -12,7 +12,7 @@ alpine=alpine-3.17.0
 key=relay
 vpc=relay
  sg=relay
-timeout_minutes=20
+timeout_minutes=60
 
 type=c6i.8xlarge
 type_ami=c6i.large
@@ -44,6 +44,8 @@ deploy() {
              --seconds-timeout $((60*$timeout_minutes))
         time libaws ec2-wait-ssh $name
 
+
+
         libaws ec2-rsync $(pwd) :/tmp $name
 
         time libaws ec2-ssh $name -c '
@@ -59,7 +61,7 @@ deploy() {
         time libaws ec2-ssh $name -c "
             cd /
             mkdir -p /tmp/ccache
-            if curl --no-progress-meter --fail '$(libaws s3-presign-get $s3_cache_bucket/cache/linux-edge-ccache-${cache_version}${arch}.tar)' > /tmp/ccache.tar; then
+            if curl --no-progress-meter --fail '$(libaws s3-presign-get -e $timeout_minutes $s3_cache_bucket/cache/linux-edge-ccache-${cache_version}${arch}.tar)' > /tmp/ccache.tar; then
                 tar xf /tmp/ccache.tar
             fi
             cd /tmp/alpine
@@ -68,7 +70,7 @@ deploy() {
             abuild -r
             rm -vf /tmp/ccache.tar
             tar cf /tmp/ccache.tar /tmp/ccache/ /var/cache/distfiles/*
-            curl --no-progress-meter --fail --upload-file /tmp/ccache.tar '$(libaws s3-presign-put $s3_cache_bucket/cache/linux-edge-ccache-${cache_version}${arch}.tar)'
+            curl --no-progress-meter --fail --upload-file /tmp/ccache.tar '$(libaws s3-presign-put -e $timeout_minutes $s3_cache_bucket/cache/linux-edge-ccache-${cache_version}${arch}.tar)'
         "
     )
     libaws ec2-rsync :.abuild/ /tmp/abuild $name
