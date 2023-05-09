@@ -1,8 +1,8 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.3.arch1
-_srcname=linux-6.3
+pkgver=6.3.1.arch1
+_srcname=linux-6.3.1
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -23,9 +23,9 @@ source=(
     config
     0001-snitch.patch
 )
-sha512sums=('768979440f4907ba64d4481b383d6101faf208f27a0b897156123aa278c5743fe3c4f61945b2541429c532d45382aaee8899ea9d44a1d2895bfbb79bfd937f65'
-            'c82fe448df43db219486ed4d90fdd444e57858e28c524ddb2ce8320f6e774efbc1304cac83fcaae17fa01ee7f83c184ff587d0956aea1cb9950911438a6773a4'
-            '3bea8d6cc6c20c19ac60c23fae7c6eb072ff48bffed7a2c9c2c51078be222e6d69807a8958fbd3133c4b52977fa44c48d2b8ddd2b7b5755223848e76e369f92c')
+b2sums=('91c7ac2fb2bdeed323b6f0812582bd82c78f62ce3754063716a8769b30c41e35ae06b042ef27fb3c59a63ca17ec764313d7971ba2ddf84f8cf9fe5885ffe0644'
+        '13d2be9bfc0368178b75673789e8f84db0efb00ec41eeda7bf441f6a97841d50cca8a1afbfe41434d5ae6a09f8eb1f3105e76f1b608fe0b7eb5377041151b369'
+        'c9dae1dbdbe98c31b1630764e866bf42e53a6c5b5a80928e78632a2101edcba85b4de0913aa493fee6b6c426500439b9e88b9be1f7ebea1822aca502633d019f')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
@@ -35,7 +35,6 @@ prepare() {
   cd $_srcname
 
   echo "Setting version..."
-  # scripts/setlocalversion --save-scmversion
   echo "-$pkgrel" > localversion.10-pkgrel
   echo "${pkgbase#linux}" > localversion.20-pkgname
 
