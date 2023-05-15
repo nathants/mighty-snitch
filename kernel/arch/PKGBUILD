@@ -1,8 +1,8 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.3.1.arch1
-_srcname=linux-6.3.1
+pkgver=6.3.2.arch1
+_srcname=linux-6.3.2
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -23,8 +23,8 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('91c7ac2fb2bdeed323b6f0812582bd82c78f62ce3754063716a8769b30c41e35ae06b042ef27fb3c59a63ca17ec764313d7971ba2ddf84f8cf9fe5885ffe0644'
-        '13d2be9bfc0368178b75673789e8f84db0efb00ec41eeda7bf441f6a97841d50cca8a1afbfe41434d5ae6a09f8eb1f3105e76f1b608fe0b7eb5377041151b369'
+b2sums=('848da561356e462406240d36321afecaaf0a7897f0a12fff08aa32c0e62999e0b641143713bfa0e8934b446efafc656b5118af35829b311c574589b5aad9efb3'
+        '0ba745a87b7f1316cdbcd7528c4196a804f15654796905b3bd589883bf936c2826f6cb02b7c5ac320bcf0e2608836818b30a49cd14cdad806046871cd1e7b3c8'
         'c9dae1dbdbe98c31b1630764e866bf42e53a6c5b5a80928e78632a2101edcba85b4de0913aa493fee6b6c426500439b9e88b9be1f7ebea1822aca502633d019f')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -107,7 +107,7 @@ _package-headers() {
   install -Dt "$builddir/tools/objtool" tools/objtool/objtool
 
   # required when DEBUG_INFO_BTF_MODULES is enabled
-  # install -Dt "$builddir/tools/bpf/resolve_btfids" tools/bpf/resolve_btfids/resolve_btfids
+  install -Dt "$builddir/tools/bpf/resolve_btfids" tools/bpf/resolve_btfids/resolve_btfids
 
   echo "Installing headers..."
   cp -t "$builddir" -a include
