@@ -1,5 +1,5 @@
 diff --git a/.clang-format b/.clang-format
-index b62836419..ed741794a 100644
+index 0d1ed8776..3e1d1bd75 100644
 --- a/.clang-format
 +++ b/.clang-format
 @@ -17,33 +17,17 @@ AlignEscapedNewlines: Left
@@ -53,7 +53,7 @@ index b62836419..ed741794a 100644
 @@ -655,15 +639,6 @@ ObjCBlockIndentWidth: 8
  ObjCSpaceAfterProperty: true
  ObjCSpaceBeforeProtocolList: true
-
+ 
 -# Taken from git's rules
 -PenaltyBreakAssignment: 10
 -PenaltyBreakBeforeFirstCallParameter: 30
@@ -67,7 +67,7 @@ index b62836419..ed741794a 100644
  ReflowComments: false
  SortIncludes: false
 diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index 291d4167f..32acc5c95 100644
+index 1c4639588..1fe47a64d 100644
 --- a/arch/x86/kernel/cpu/intel.c
 +++ b/arch/x86/kernel/cpu/intel.c
 @@ -1260,6 +1260,13 @@ static void __init sld_state_setup(void)
@@ -82,13 +82,13 @@ index 291d4167f..32acc5c95 100644
 +    // fine.
 +    sld_state = sld_off;
  }
-
+ 
  static void __init __split_lock_setup(void)
 diff --git a/security/Kconfig b/security/Kconfig
-index e6db09a77..5e4c09f5c 100644
+index 97abeb9b9..521d2aa6e 100644
 --- a/security/Kconfig
 +++ b/security/Kconfig
-@@ -203,6 +203,7 @@ source "security/smack/Kconfig"
+@@ -198,6 +198,7 @@ source "security/smack/Kconfig"
  source "security/tomoyo/Kconfig"
  source "security/apparmor/Kconfig"
  source "security/loadpin/Kconfig"
@@ -96,9 +96,9 @@ index e6db09a77..5e4c09f5c 100644
  source "security/yama/Kconfig"
  source "security/safesetid/Kconfig"
  source "security/lockdown/Kconfig"
-@@ -261,4 +262,3 @@ config LSM
+@@ -258,4 +259,3 @@ config LSM
  source "security/Kconfig.hardening"
-
+ 
  endmenu
 -
 diff --git a/security/Makefile b/security/Makefile
@@ -114,13 +114,13 @@ index 18121f8f8..31ddf59fe 100644
  obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
  obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
 diff --git a/security/security.c b/security/security.c
-index d1571900a..a33ac9674 100644
+index d5ff7ff45..e6bda5f56 100644
 --- a/security/security.c
 +++ b/security/security.c
-@@ -348,14 +348,14 @@ static void __init ordered_lsm_init(void)
+@@ -356,14 +356,14 @@ static void __init ordered_lsm_init(void)
  	ordered_lsms = kcalloc(LSM_COUNT + 1, sizeof(*ordered_lsms),
- 				GFP_KERNEL);
-
+ 			       GFP_KERNEL);
+ 
 -	if (chosen_lsm_order) {
 -		if (chosen_major_lsm) {
 -			pr_warn("security=%s is ignored because it is superseded by lsm=%s\n",
@@ -138,7 +138,7 @@ index d1571900a..a33ac9674 100644
 +	/* 	ordered_lsm_parse(chosen_lsm_order, "cmdline"); */
 +	/* } else */
  		ordered_lsm_parse(builtin_lsm_order, "builtin");
-
+ 
  	for (lsm = ordered_lsms; *lsm; lsm++)
 diff --git a/security/snitch/Kconfig b/security/snitch/Kconfig
 new file mode 100644
@@ -294,10 +294,10 @@ index 000000000..7ba274106
 +#endif /** HASHTABLE_H */
 diff --git a/security/snitch/snitch.c b/security/snitch/snitch.c
 new file mode 100644
-index 000000000..d34d980d4
+index 000000000..604ba023d
 --- /dev/null
 +++ b/security/snitch/snitch.c
-@@ -0,0 +1,345 @@
+@@ -0,0 +1,347 @@
 +/*
 + * Copyright (C) 2019  Argus Cyber Security Ltd, Tel Aviv.
 + * Copyright (C) 2022-present  Nathan Todd-Stone <me@nathants.com>
@@ -536,6 +536,8 @@ index 000000000..d34d980d4
 +        struct sockaddr_storage remote = {0};
 +        int res = sock->ops->getname(sock, (struct sockaddr*)&remote, 2);
 +        if (res < 0) {
++            if (strcmp("/usr/bin/dhcpcd", exebuf) == 0)
++                return ALLOW; // why does arch need this?
 +            print("exe=%s cmdline=[%s] sendmsg get remote addr failure", exebuf, cmdlinebuf);
 +            return DENY;
 +        }
@@ -599,7 +601,7 @@ index 000000000..d34d980d4
 +    return DENY;
 +}
 +
-+static struct security_hook_list snitch_ops[] __lsm_ro_after_init = {
++static struct security_hook_list snitch_ops[] __ro_after_init = {
 +
 +    // task cleanup
 +    LSM_HOOK_INIT(task_free, snitch_task_free),
@@ -633,7 +635,7 @@ index 000000000..d34d980d4
 +    return 0;
 +}
 +
-+int snitch_enabled __lsm_ro_after_init = 1;
++int snitch_enabled __ro_after_init = 1;
 +
 +DEFINE_LSM(snitch) = {
 +    .name = "snitch",

@@ -16,6 +16,8 @@ when updating kernel configs, take upstream, and then ensure the following:
 
 - `CONFIG_USB_HIDDEV=y`
 
+- `# CONFIG_IO_URING is not set`
+
 - disable ipv6:
   ```bash
   ls config-edge.* | while read config; do
