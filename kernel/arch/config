@@ -10579,7 +10579,7 @@ CONFIG_INTEGRITY_AUDIT=y
 # CONFIG_DEFAULT_SECURITY_APPARMOR is not set
 CONFIG_DEFAULT_SECURITY_DAC=y
 CONFIG_SNITCH=y
-CONFIG_LSM="snitch"
+CONFIG_LSM="snitch,landlock,lockdown,yama,integrity,bpf"
 
 #
 # Kernel hardening options

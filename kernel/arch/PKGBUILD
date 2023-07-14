@@ -1,8 +1,8 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.3.11.arch1
-_srcname=linux-6.3.11
+pkgver=6.4.3.arch1
+_srcname=linux-6.4.3
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -23,8 +23,8 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('cd199e2635547b2458d77da2ffc2253026a7649b48ea6774118dcfbcc6eb077eb6aba41cffc55f1f448ac0c536f3867836c8446508527cfca58fff7947e5c4a8'
-        '7eeed4111439e7cdb6dec43d43f8a2450214e4a1cc42b9c33f4b56f8a28b94c1af14fc14881edd25c3438d18e12635fb0fce944c7c486cf77399ec105bdbbcba'
+b2sums=('d38cae9706127fa28cc55b50ceeba7601de3d1db648b934b9d33e0b439324790074b755b1de204586fa098a326f5c88f81550cff76489b2ea6505987fc243c56'
+        '283e65fae1843b1743a64d694e2adad45203ee0ceb76c197f72f880a2a6049335f1ce8965a444e6b85be5f78095a024bcd930bebba45920a89e96a4d47c3b797'
         'f69772d323151b867e201197d2a9199809a81fe5590589a3bdb6bdb0336bd1544f5fb021e26d76af95792ad76b64177a00e1bd0538bb3da78de23c014a66680c')
 
 export KBUILD_BUILD_HOST=archlinux

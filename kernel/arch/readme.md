@@ -1,10 +1,10 @@
-upstream source: https://github.com/archlinux/svntogit-packages/tree/packages/linux/trunk
+upstream source: https://gitlab.archlinux.org/archlinux/packaging/packages/linux
 
 when updating kernel configs, take upstream, and then ensure the following:
 
 - `CONFIG_SECURITY_NETWORK=y`
 
-- `CONFIG_LSM="snitch"`
+- `CONFIG_LSM="snitch,..."` prepend "snitch" to this list
 
 - `CONFIG_SNITCH=y`
 
