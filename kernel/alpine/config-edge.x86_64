@@ -1,8 +1,8 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 6.4.1 Kernel Configuration
+# Linux/x86_64 6.4.3 Kernel Configuration
 #
-CONFIG_CC_VERSION_TEXT="gcc (Alpine 13.1.1_git20230624) 13.1.1 20230624"
+CONFIG_CC_VERSION_TEXT="gcc (Alpine 13.1.1_git20230708) 13.1.1 20230708"
 CONFIG_CC_IS_GCC=y
 CONFIG_GCC_VERSION=130101
 CONFIG_CLANG_VERSION=0
@@ -9093,7 +9093,7 @@ CONFIG_SECURITY_LANDLOCK=y
 # CONFIG_IMA_SECURE_AND_OR_TRUSTED_BOOT is not set
 CONFIG_DEFAULT_SECURITY_DAC=y
 CONFIG_SNITCH=y
-CONFIG_LSM="snitch"
+CONFIG_LSM="snitch,lockdown,yama,loadpin,safesetid,integrity"
 
 #
 # Kernel hardening options

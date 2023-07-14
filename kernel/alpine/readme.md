@@ -4,7 +4,7 @@ when updating kernel configs, take upstream, and then ensure the following:
 
 - `CONFIG_SECURITY_NETWORK=y`
 
-- `CONFIG_LSM="snitch"`
+- `CONFIG_LSM="snitch,..."` prepend "snitch" to this list
 
 - `CONFIG_SNITCH=y`
 
