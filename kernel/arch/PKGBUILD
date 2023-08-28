@@ -1,8 +1,9 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.4.4.arch1
-_srcname=linux-6.4.4
+ver=6.5
+pkgver=$ver.arch1
+_srcname=linux-$ver
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -13,18 +14,18 @@ depends=(
     libnetfilter_queue python-blessed linux-headers nftables
 )
 makedepends=(
-  bc libelf pahole cpio perl tar xz
+  bc libelf pahole cpio perl tar xz python
   xmlto python-sphinx graphviz imagemagick texlive-latexextra
   git
 )
 options=('!strip')
 source=(
-    "$_srcname::https://cdn.kernel.org/pub/linux/kernel/v6.x/$_srcname.tar.xz"
+   "$_srcname.tar::https://cdn.kernel.org/pub/linux/kernel/v6.x/$_srcname.tar.xz"
     config
     0001-snitch.patch
 )
-b2sums=('1ab6c93da986dac6a07a5e3bc764f9d2a5bb9b8989321244455d894690634ac04364e6a3f960e8674f47ae22fc4ed09b18aa60cbf279636083e61aa6524f8a59'
-        '283e65fae1843b1743a64d694e2adad45203ee0ceb76c197f72f880a2a6049335f1ce8965a444e6b85be5f78095a024bcd930bebba45920a89e96a4d47c3b797'
+b2sums=('2e641b79a080e8f4ce283bcf6b74e2c6f15a374367f1c4c875c663868dbe801317340824fb3adb46b3a51d3b7e1f67cc4e8144d367621ec43ffba5c4eb8abb39'
+        'b296ab81146bd191852de2c8dd91d9cd39e83e46f01f507e2e4efa6361e6a0db25441c4b9ef385fb15cdd61fb3afff77fb2b925cade332bd0867416b9c7484d9'
         'f69772d323151b867e201197d2a9199809a81fe5590589a3bdb6bdb0336bd1544f5fb021e26d76af95792ad76b64177a00e1bd0538bb3da78de23c014a66680c')
 
 export KBUILD_BUILD_HOST=archlinux
