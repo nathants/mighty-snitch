@@ -1,13 +1,12 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-ver=6.5
+ver=6.5.1
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
-url="https://github.com/archlinux/linux/commits/$_srctag"
 arch=(x86_64)
 license=(GPL2)
 depends=(
@@ -24,8 +23,8 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('2e641b79a080e8f4ce283bcf6b74e2c6f15a374367f1c4c875c663868dbe801317340824fb3adb46b3a51d3b7e1f67cc4e8144d367621ec43ffba5c4eb8abb39'
-        'b296ab81146bd191852de2c8dd91d9cd39e83e46f01f507e2e4efa6361e6a0db25441c4b9ef385fb15cdd61fb3afff77fb2b925cade332bd0867416b9c7484d9'
+b2sums=('9d44c188bb7b5d35c685b5718d61a3b5a0b6a335019a8c549ca79f48ea85884dd535f2eb15ab5e0fab841e9861007d706f2424d7bb1ee96f494afa884838a9c8'
+        '659d5b29f7cf97191a5e7c7d33021865ae4430f94123f79d8f8adf2d2647ccc3e3e659a7d8247fc7a26028033fb9730ba0e2b81c10264e5e80f4ad04ec1fbf5f'
         'f69772d323151b867e201197d2a9199809a81fe5590589a3bdb6bdb0336bd1544f5fb021e26d76af95792ad76b64177a00e1bd0538bb3da78de23c014a66680c')
 
 export KBUILD_BUILD_HOST=archlinux
