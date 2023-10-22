@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-ver=6.5.6
+ver=6.5.8
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
@@ -23,7 +23,7 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('6fec33a0ee1700694c43c2271263d23408f3ad53f71200717ebd3843dd0aecb5235a058439e63e304da276978f1e4148ae1aac78a22166b2ca236b137a406c0f'
+b2sums=('5d104cfd8f1f08b181ab85bb251e0a2fc1b37a791f396e83fab82ff5aeadc0c69a746359a6005dc766546c5a880235e1b4c477d67bd7b33ef6c4aaf4a8ea488b'
         'cf149f933740b9d0a38fdfc708e4e9cfdbebc301d58edd9f3e51ae0b2dce8a34622c4422335d2c4f70d4fc8d758badd886ae579ff22206d074c4c38582fdaec0'
         'f69772d323151b867e201197d2a9199809a81fe5590589a3bdb6bdb0336bd1544f5fb021e26d76af95792ad76b64177a00e1bd0538bb3da78de23c014a66680c')
 
@@ -58,7 +58,7 @@ prepare() {
 
 build() {
   cd $_srcname
-  make all -j $(($(lscpu |grep 'Core(s)'|awk '{print $NF}')+2))
+  make all -j $(($(lscpu |grep 'Core(s)'|awk '{print $NF}')+2)) CFLAGS="-march=native -mtune=native"
 }
 
 _package() {
