@@ -31,7 +31,7 @@ if [ "${COLOR:-y}" = n ]; then
     sudo -E stdbuf -o0 ./snitch
 else
     sudo -E stdbuf -o0 ./snitch 2>&1\
-        | tee ~/.snitch.log \
+        | tee ${SNITCH_LOG:-/tmp/snitch.log} \
         | color \
               allow:green \
               deny:red \
