@@ -5,10 +5,10 @@ if ! which set-opt &>/dev/null; then
     /usr/bin/sudo chmod +x /usr/bin/set-opt
 fi
 
-grep CONFIG_SECURITY_NETWORK=y config
-grep CONFIG_NETFILTER_NETLINK_QUEUE=m config
-grep CONFIG_NFT_QUEUE=m config
+grep CONFIG_SECURITY_NETWORK=y config-edge.x86_64
+grep CONFIG_NETFILTER_NETLINK_QUEUE=m config-edge.x86_64
+grep CONFIG_NFT_QUEUE=m config-edge.x86_64
 
-sed -i -r 's/^CONFIG_LSM="([^"]+)"/CONFIG_SNITCH=y\nCONFIG_LSM="snitch,\1"/' config
-sed -i -r 's/^(CONFIG_IO_URING)=.$/# \1 is not set/' config
-sed -i -r 's/^(CONFIG_.*IPV6.*)=.$/# \1 is not set/' config
+sed -i -r 's/^CONFIG_LSM="([^"]+)"/CONFIG_SNITCH=y\nCONFIG_LSM="snitch,\1"/' config-edge.x86_64
+sed -i -r 's/^(CONFIG_IO_URING)=.$/# \1 is not set/' config-edge.x86_64
+sed -i -r 's/^(CONFIG_.*IPV6.*)=.$/# \1 is not set/' config-edge.x86_64
