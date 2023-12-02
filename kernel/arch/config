@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 6.6.0-arch1 Kernel Configuration
+# Linux/x86 6.6.2-arch1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.1 20230801"
 CONFIG_CC_IS_GCC=y
@@ -10565,7 +10565,7 @@ CONFIG_CIFS_DEBUG=y
 # CONFIG_CIFS_DEBUG_DUMP_KEYS is not set
 CONFIG_CIFS_DFS_UPCALL=y
 CONFIG_CIFS_SWN_UPCALL=y
-# CONFIG_CIFS_SMB_DIRECT is not set
+CONFIG_CIFS_SMB_DIRECT=y
 CONFIG_CIFS_FSCACHE=y
 CONFIG_SMB_SERVER=m
 CONFIG_SMB_SERVER_SMBDIRECT=y
@@ -10717,7 +10717,8 @@ CONFIG_INTEGRITY_AUDIT=y
 # CONFIG_DEFAULT_SECURITY_TOMOYO is not set
 # CONFIG_DEFAULT_SECURITY_APPARMOR is not set
 CONFIG_DEFAULT_SECURITY_DAC=y
-CONFIG_LSM=snitch,landlock,lockdown,yama,integrity,bpf
+CONFIG_SNITCH=y
+CONFIG_LSM="snitch,landlock,lockdown,yama,integrity,bpf"
 
 #
 # Kernel hardening options
@@ -11621,4 +11622,3 @@ CONFIG_MEMTEST=y
 #
 # end of Rust hacking
 # end of Kernel hacking
-CONFIG_SNITCH=y
