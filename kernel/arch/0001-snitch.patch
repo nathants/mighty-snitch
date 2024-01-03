@@ -53,7 +53,7 @@ index 0d1ed8776..3e1d1bd75 100644
 @@ -655,15 +639,6 @@ ObjCBlockIndentWidth: 8
  ObjCSpaceAfterProperty: true
  ObjCSpaceBeforeProtocolList: true
- 
+
 -# Taken from git's rules
 -PenaltyBreakAssignment: 10
 -PenaltyBreakBeforeFirstCallParameter: 30
@@ -66,24 +66,6 @@ index 0d1ed8776..3e1d1bd75 100644
  PointerAlignment: Right
  ReflowComments: false
  SortIncludes: false
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index 1c4639588..1fe47a64d 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -1260,6 +1260,13 @@ static void __init sld_state_setup(void)
- 		}
- 	}
- 	sld_state = state;
-+
-+    // TODO why this being anything other than off causes the kernel
-+    // to panic sometimes. it would be good to understand and fix this
-+    // issue, but since it is only a performance degradation, and
-+    // snitch already is a performance degradation, it's probably
-+    // fine.
-+    sld_state = sld_off;
- }
- 
- static void __init __split_lock_setup(void)
 diff --git a/security/Kconfig b/security/Kconfig
 index 97abeb9b9..521d2aa6e 100644
 --- a/security/Kconfig
@@ -98,7 +80,7 @@ index 97abeb9b9..521d2aa6e 100644
  source "security/lockdown/Kconfig"
 @@ -258,4 +259,3 @@ config LSM
  source "security/Kconfig.hardening"
- 
+
  endmenu
 -
 diff --git a/security/Makefile b/security/Makefile
@@ -120,7 +102,7 @@ index d5ff7ff45..e6bda5f56 100644
 @@ -356,14 +356,14 @@ static void __init ordered_lsm_init(void)
  	ordered_lsms = kcalloc(LSM_COUNT + 1, sizeof(*ordered_lsms),
  			       GFP_KERNEL);
- 
+
 -	if (chosen_lsm_order) {
 -		if (chosen_major_lsm) {
 -			pr_warn("security=%s is ignored because it is superseded by lsm=%s\n",
@@ -138,7 +120,7 @@ index d5ff7ff45..e6bda5f56 100644
 +	/* 	ordered_lsm_parse(chosen_lsm_order, "cmdline"); */
 +	/* } else */
  		ordered_lsm_parse(builtin_lsm_order, "builtin");
- 
+
  	for (lsm = ordered_lsms; *lsm; lsm++)
 diff --git a/security/snitch/Kconfig b/security/snitch/Kconfig
 new file mode 100644
@@ -265,7 +247,7 @@ index 000000000..7ba274106
 +
 +struct hashtable {
 +    DECLARE_HASHTABLE(table, ilog2(HASHTABLE_DEFAULT_SIZE));
-+    spinlock_t lock;
++    spinlock_t lock __attribute__((aligned(64)));
 +};
 +
 +struct hashtable_node {
@@ -355,7 +337,7 @@ index 000000000..604ba023d
 +
 +DECLARE_WAIT_QUEUE_HEAD(wait_queue_responses);
 +
-+spinlock_t netlink_lock;
++spinlock_t netlink_lock __attribute__((aligned(64)));
 +
 +#define NETLINK_USER 31
 +
