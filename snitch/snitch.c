@@ -752,14 +752,7 @@ i32 prompt(event_t *e, char *payload, i32 size) {
     char outfile [64] = {0};
     sprintf(outfile, "/tmp/snitch_%d", e->id);
     char inbuf[4096] = {0};
-    i32 n;
-    if (foot_terminal) {
-        // on alpine postmarketos sdm845 use foot as terminal
-        n = sprintf(inbuf, "DISPLAY=:0 foot snitch-prompt '%.*s' %s 2>/dev/null", size, payload, outfile);
-    } else {
-        // on alpine x86_64 use st as terminal
-        n = sprintf(inbuf, "DISPLAY=:0 st snitch-prompt '%.*s' %s 2>/dev/null", size, payload, outfile);
-    }
+    i32 n = sprintf(inbuf, "DISPLAY=:0 st snitch-prompt '%.*s' %s 2>/dev/null", size, payload, outfile);
     ASSERT(n < sizeof(inbuf), "prompt inbuf overflow\n");
     FILE *f = popen(inbuf, "r");
     if (!f) {

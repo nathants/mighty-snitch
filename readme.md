@@ -26,9 +26,9 @@ finally snitch responds to the kernel and the request is allowed or denied.
 
 ## hardware
 
-the primary test environments are [alpine](https://alpinelinux.org/), [arch](https://archlinux.org/), and [postmarketos](https://postmarketos.org/).
+the primary test environments is [arch](https://archlinux.org/)
 
-the primary test devices are [thinkpad x1](https://www.lenovo.com/us/en/c/laptops/thinkpad/thinkpadx1), [rog x670e-i](https://rog.asus.com/motherboards/rog-strix/rog-strix-x670e-i-gaming-wifi-model/), and [oneplus 6t](https://www.oneplus.com/6t).
+the primary test devices are [thinkpad x1](https://www.lenovo.com/us/en/c/laptops/thinkpad/thinkpadx1) and [rog x670e-i](https://rog.asus.com/motherboards/rog-strix/rog-strix-x670e-i-gaming-wifi-model/)
 
 ## prior art
 
@@ -96,128 +96,6 @@ send  deny  /usr/lib/firefox/firefox  mozilla.cloudflare-dns.com             443
 send  deny  /usr/lib/firefox/firefox  normandy.cdn.mozilla.net               443  tcp  /usr/lib/firefox/firefox
 send  deny  /usr/lib/firefox/firefox  push.services.mozilla.com              443  tcp  /usr/lib/firefox/firefox
 send  deny  /usr/lib/firefox/firefox  shavar.services.mozilla.com            443  tcp  /usr/lib/firefox/firefox
-```
-
-## install alpine
-
-copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
-
-```bash
-cd /tmp
-wget linux-edge-*.apk
-wget linux-edge-dev-*.apk
-wget me@nathants.com-*.rsa.pub
-sudo mv *.pub /etc/apk/keys/
-sudo apk add *.apk
-sudo reboot
-
-cd ~
-git clone https://github.com/nathants/mighty-snitch
-
-cd ~/mighty-snitch/snitch-prompt
-sudo pip install .
-
-cd ~/mighty-snitch/snitch
-bash snitch.sh
-```
-
-## install postmarketos
-
-copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
-
-```bash
-cd /tmp
-wget linux-postmarketos-qcom-sdm845-*.apk
-wget pmos@local-*.rsa.pub
-sudo mv *.pub /etc/apk/keys/
-sudo apk add *.apk
-sudo reboot
-
-cd ~
-git clone https://github.com/nathants/mighty-snitch
-
-cd ~/mighty-snitch/snitch-prompt
-sudo pip install .
-
-cd ~/mighty-snitch/snitch
-bash snitch.sh
-```
-
-## install arch
-
-copy latest wget urls from: https://github.com/nathants/mighty-snitch/releases
-
-```bash
-cd /tmp
-wget linux-*.zst
-wget linux-docs-*.zst
-wget linux-headers-*.zst
-sudo pacman -U *.zst
-sudo reboot
-
-cd ~
-git clone https://github.com/nathants/mighty-snitch
-
-cd ~/mighty-snitch/snitch-prompt
-sudo pip install .
-
-cd ~/mighty-snitch/snitch
-bash snitch.sh
-```
-
-## build alpine on aws and install
-
-```bash
-sudo apk add go
-go install github.com/nathants/libaws@latest
-export PATH=$PATH:$(go env GOPATH)/bin
-
-export MIGHTY_SNITCH_S3_BUCKET=$NAME
-export MIGHTY_SNITCH_AWS_ACCOUNT=$ACCOUNT_NUMBER
-export MIGHTY_SNITCH_PUBKEY_CONTENT=$(cat ~/.ssh/id_ed25519.pub)
-
-cd ~
-git clone https://github.com/nathants/mighty-snitch
-
-cd ~/mighty-snitch/kernel/alpine
-bash build.sh
-sudo mv /tmp/abuild/*.pub /etc/apk/keys/
-sudo apk add /tmp/packages/*/*/*.apk
-sudo reboot
-
-cd ~/mighty-snitch/snitch-prompt
-sudo pip install .
-
-cd ~/mighty-snitch/snitch
-bash snitch.sh
-```
-
-## build alpine on aws and install
-
-```bash
-
-sudo apk add go
-go install github.com/nathants/libaws@latest
-export PATH=$PATH:$(go env GOPATH)/bin
-
-export MIGHTY_SNITCH_S3_BUCKET=$NAME
-export MIGHTY_SNITCH_AWS_ACCOUNT=$ACCOUNT_NUMBER
-export MIGHTY_SNITCH_PUBKEY_CONTENT=$(cat ~/.ssh/id_ed25519.pub)
-
-cd ~
-git clone https://github.com/nathants/mighty-snitch
-
-cd ~/mighty-snitch/kernel/alpine-sdm845
-bash build.sh
-sudo mv /tmp/*.pub /etc/apk/keys/
-sudo apk add /tmp/*.apk
-sudo reboot
-
-cd ~/mighty-snitch/snitch-prompt
-sudo pip install .
-
-cd ~/mighty-snitch/snitch
-bash snitch.sh
 ```
 
 ## build arch and install
