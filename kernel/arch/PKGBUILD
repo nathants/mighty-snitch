@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-ver=6.7.4
+ver=6.7.5
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
@@ -23,7 +23,7 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('578114990b2987e2b241a7492bd4a69c46adfd613eba9715d63fd4565c19678dfab06b5107a0ff791e9a3190cb52b75a76d231aa39d4e7fba24e79f7f18935a1'
+b2sums=('91e5abb3905ba9e8b5cdf26b89758f4454b4e573f148fb08340c60852115d95068e44420d73373a406cb47fb011fc14ee65294489f197a3f7f39d3d8e24b2f2d'
         'f0fc3a4ea0683943535a29eccaec01830150a4a768e80998bd129a3b3678111c3c7de27dcbface0c8c72582f79b236b9a58e7a0252e0eba8a5aeb21522184eaf'
         '25387c87a4855619f6c8f6622a91f1704e8a2aba06c4eaac170e656783b0dd22c40ca675209b682998012a63fc11a5f5901cc33dc4caa021de8a6bfeb98b916c')
 
