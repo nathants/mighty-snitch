@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-ver=6.7.5
+ver=6.7.6
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
@@ -23,8 +23,8 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('91e5abb3905ba9e8b5cdf26b89758f4454b4e573f148fb08340c60852115d95068e44420d73373a406cb47fb011fc14ee65294489f197a3f7f39d3d8e24b2f2d'
-        'f0fc3a4ea0683943535a29eccaec01830150a4a768e80998bd129a3b3678111c3c7de27dcbface0c8c72582f79b236b9a58e7a0252e0eba8a5aeb21522184eaf'
+b2sums=('51d6e2304e7a9188a0fec5714276589cb46948157c76a2f4ed3f5e0bf634d94a89ea75251229a86e018767a3367328c16b610d631c78d82663dcd1d904b73385'
+        '4102c3006f5405d84a1dccbbafab9bc9adc814b3ac7027be26d0efd061b7b26bdebe76f4ef9c231832a58e2dd5a372ff65f69da9c182b1c4e4a498575745ce74'
         '25387c87a4855619f6c8f6622a91f1704e8a2aba06c4eaac170e656783b0dd22c40ca675209b682998012a63fc11a5f5901cc33dc4caa021de8a6bfeb98b916c')
 
 export KBUILD_BUILD_HOST=archlinux
