@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-ver=6.7.9
+ver=6.8.1
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
@@ -14,7 +14,7 @@ depends=(
 )
 makedepends=(
   bc libelf pahole cpio perl tar xz python
-  xmlto python-sphinx graphviz imagemagick texlive-latexextra
+  xmlto python-sphinx python-yaml graphviz imagemagick texlive-latexextra
   git
 )
 options=('!strip')
@@ -23,9 +23,9 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('2a5990e067439dcb3a6e7647832c85a2ce7faf28c48f414ebcb4d33ea37f870204c4b6bf98fca1faaf61bb59f579d6b597d8b2b29bd8cd2cc3b25afba3fe1fd8'
-        '4102c3006f5405d84a1dccbbafab9bc9adc814b3ac7027be26d0efd061b7b26bdebe76f4ef9c231832a58e2dd5a372ff65f69da9c182b1c4e4a498575745ce74'
-        '25387c87a4855619f6c8f6622a91f1704e8a2aba06c4eaac170e656783b0dd22c40ca675209b682998012a63fc11a5f5901cc33dc4caa021de8a6bfeb98b916c')
+b2sums=('2b518f8f39b4dcea1c580cb0664d59c165db989422fd6fd6b65d3dd1e4548bc6e0cedfc95c2584ae56f69ac1a1d3de6552ee61e77b08799a5275934a453ab929'
+        '2aef4a9650b477c2eb464b85b8044fb47233110b41b41ec35e847a56029a7d238e8644a5387d3275a9e0a71412bec1f9ac77b33f088ba73d126ccb39a40e26a2'
+        '61df3031cdcea1dd7019d4657e9fca7ccff7c0c1f53ea6ccbdeda728ba5acd808dbfd608195015ae4dbc1e07bd4f6fce7d2a0b7ccd22ad955bd6bf6d1c246f03')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase

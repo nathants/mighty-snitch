@@ -1,76 +1,20 @@
-diff --git a/.clang-format b/.clang-format
-index 0d1ed8776..3e1d1bd75 100644
---- a/.clang-format
-+++ b/.clang-format
-@@ -17,33 +17,17 @@ AlignEscapedNewlines: Left
- AlignOperands: true
- AlignTrailingComments: false
- AllowAllParametersOfDeclarationOnNextLine: false
--AllowShortBlocksOnASingleLine: false
--AllowShortCaseLabelsOnASingleLine: false
--AllowShortFunctionsOnASingleLine: None
--AllowShortIfStatementsOnASingleLine: false
--AllowShortLoopsOnASingleLine: false
-+AllowShortBlocksOnASingleLine: true
-+AllowShortCaseLabelsOnASingleLine: true
-+AllowShortFunctionsOnASingleLine: true
-+AllowShortIfStatementsOnASingleLine: true
-+AllowShortLoopsOnASingleLine: true
- AlwaysBreakAfterDefinitionReturnType: None
- AlwaysBreakAfterReturnType: None
- AlwaysBreakBeforeMultilineStrings: false
- AlwaysBreakTemplateDeclarations: false
- BinPackArguments: true
- BinPackParameters: true
--BraceWrapping:
--  AfterClass: false
--  AfterControlStatement: false
--  AfterEnum: false
--  AfterFunction: true
--  AfterNamespace: true
--  AfterObjCDeclaration: false
--  AfterStruct: false
--  AfterUnion: false
--  AfterExternBlock: false
--  BeforeCatch: false
--  BeforeElse: false
--  IndentBraces: false
--  SplitEmptyFunction: true
--  SplitEmptyRecord: true
--  SplitEmptyNamespace: true
- BreakBeforeBinaryOperators: None
- BreakBeforeBraces: Custom
- BreakBeforeInheritanceComma: false
-@@ -52,7 +36,7 @@ BreakConstructorInitializersBeforeComma: false
- BreakConstructorInitializers: BeforeComma
- BreakAfterJavaFieldAnnotations: false
- BreakStringLiterals: false
--ColumnLimit: 80
-+ColumnLimit: 0
- CommentPragmas: '^ IWYU pragma:'
- CompactNamespaces: false
- ConstructorInitializerAllOnOneLineOrOnePerLine: false
-@@ -655,15 +639,6 @@ ObjCBlockIndentWidth: 8
- ObjCSpaceAfterProperty: true
- ObjCSpaceBeforeProtocolList: true
-
--# Taken from git's rules
--PenaltyBreakAssignment: 10
--PenaltyBreakBeforeFirstCallParameter: 30
--PenaltyBreakComment: 10
--PenaltyBreakFirstLessLess: 0
--PenaltyBreakString: 10
--PenaltyExcessCharacter: 100
--PenaltyReturnTypeOnItsOwnLine: 60
--
- PointerAlignment: Right
- ReflowComments: false
- SortIncludes: false
+diff --git a/include/uapi/linux/lsm.h b/include/uapi/linux/lsm.h
+index f8aef9ade..ae0352fb4 100644
+--- a/include/uapi/linux/lsm.h
++++ b/include/uapi/linux/lsm.h
+@@ -62,6 +62,7 @@ struct lsm_ctx {
+ #define LSM_ID_LOCKDOWN		108
+ #define LSM_ID_BPF		109
+ #define LSM_ID_LANDLOCK		110
++#define LSM_ID_SNITCH		111
+ 
+ /*
+  * LSM_ATTR_XXX definitions identify different LSM attributes
 diff --git a/security/Kconfig b/security/Kconfig
-index 97abeb9b9..521d2aa6e 100644
+index 52c9af08a..eb054c88e 100644
 --- a/security/Kconfig
 +++ b/security/Kconfig
-@@ -198,6 +198,7 @@ source "security/smack/Kconfig"
+@@ -190,6 +190,7 @@ source "security/smack/Kconfig"
  source "security/tomoyo/Kconfig"
  source "security/apparmor/Kconfig"
  source "security/loadpin/Kconfig"
@@ -78,16 +22,16 @@ index 97abeb9b9..521d2aa6e 100644
  source "security/yama/Kconfig"
  source "security/safesetid/Kconfig"
  source "security/lockdown/Kconfig"
-@@ -258,4 +259,3 @@ config LSM
+@@ -250,4 +251,3 @@ config LSM
  source "security/Kconfig.hardening"
-
+ 
  endmenu
 -
 diff --git a/security/Makefile b/security/Makefile
-index 18121f8f8..31ddf59fe 100644
+index 59f238490..cf910b210 100644
 --- a/security/Makefile
 +++ b/security/Makefile
-@@ -19,6 +19,7 @@ obj-$(CONFIG_SECURITY_TOMOYO)		+= tomoyo/
+@@ -20,6 +20,7 @@ obj-$(CONFIG_SECURITY_TOMOYO)		+= tomoyo/
  obj-$(CONFIG_SECURITY_APPARMOR)		+= apparmor/
  obj-$(CONFIG_SECURITY_YAMA)		+= yama/
  obj-$(CONFIG_SECURITY_LOADPIN)		+= loadpin/
@@ -96,13 +40,13 @@ index 18121f8f8..31ddf59fe 100644
  obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
  obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
 diff --git a/security/security.c b/security/security.c
-index d5ff7ff45..e6bda5f56 100644
+index 7035ee35a..373136e7f 100644
 --- a/security/security.c
 +++ b/security/security.c
-@@ -356,14 +356,14 @@ static void __init ordered_lsm_init(void)
+@@ -381,14 +381,14 @@ static void __init ordered_lsm_init(void)
  	ordered_lsms = kcalloc(LSM_COUNT + 1, sizeof(*ordered_lsms),
  			       GFP_KERNEL);
-
+ 
 -	if (chosen_lsm_order) {
 -		if (chosen_major_lsm) {
 -			pr_warn("security=%s is ignored because it is superseded by lsm=%s\n",
@@ -120,7 +64,7 @@ index d5ff7ff45..e6bda5f56 100644
 +	/* 	ordered_lsm_parse(chosen_lsm_order, "cmdline"); */
 +	/* } else */
  		ordered_lsm_parse(builtin_lsm_order, "builtin");
-
+ 
  	for (lsm = ordered_lsms; *lsm; lsm++)
 diff --git a/security/snitch/Kconfig b/security/snitch/Kconfig
 new file mode 100644
@@ -233,7 +177,7 @@ index 000000000..e4fa8522c
 +}
 diff --git a/security/snitch/hashtable.h b/security/snitch/hashtable.h
 new file mode 100644
-index 000000000..7ba274106
+index 000000000..f04f9d24c
 --- /dev/null
 +++ b/security/snitch/hashtable.h
 @@ -0,0 +1,37 @@
@@ -276,10 +220,10 @@ index 000000000..7ba274106
 +#endif /** HASHTABLE_H */
 diff --git a/security/snitch/snitch.c b/security/snitch/snitch.c
 new file mode 100644
-index 000000000..604ba023d
+index 000000000..8a2ccffc4
 --- /dev/null
 +++ b/security/snitch/snitch.c
-@@ -0,0 +1,347 @@
+@@ -0,0 +1,352 @@
 +/*
 + * Copyright (C) 2019  Argus Cyber Security Ltd, Tel Aviv.
 + * Copyright (C) 2022-present  Nathan Todd-Stone <me@nathants.com>
@@ -427,11 +371,11 @@ index 000000000..604ba023d
 +    char type = 0;                                                                                                                                                                  \
 +    char namebuf[24] = {0};                                                                                                                                                         \
 +    snprintf(namebuf, sizeof(namebuf), name);                                                                                                                                       \
-+    char tempbuf[256] = {0};                                                                                                                                                        \
++    char tempbuf[240] = {0};                                                                                                                                                        \
 +    char *temp = NULL;                                                                                                                                                              \
-+    char exebuf[256] = {0};                                                                                                                                                         \
-+    char cmdlinebuf[256] = {0};                                                                                                                                                     \
-+    char databuf[256] = {0};                                                                                                                                                        \
++    char exebuf[240] = {0};                                                                                                                                                         \
++    char cmdlinebuf[240] = {0};                                                                                                                                                     \
++    char databuf[240] = {0};                                                                                                                                                        \
 +    char *head = NULL;
 +
 +#define SEND_RECV()                                                                                                                                 \
@@ -599,12 +543,17 @@ index 000000000..604ba023d
 +
 +};
 +
++static const struct lsm_id snitch_lsmid = {
++	.name = "snitch",
++	.id = LSM_ID_SNITCH,
++};
++
 +static int __init snitch_security_init(void) {
 +    print("security_initcall start");
 +    user_pid = 0;
 +    spin_lock_init(&netlink_lock);
 +    hashtable_init(&hashtable_responses);
-+    security_add_hooks(snitch_ops, ARRAY_SIZE(snitch_ops), "snitch");
++    security_add_hooks(snitch_ops, ARRAY_SIZE(snitch_ops), &snitch_lsmid);
 +    print("security_initcall finished successfully");
 +    return 0;
 +}

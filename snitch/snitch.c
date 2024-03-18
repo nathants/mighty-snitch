@@ -32,10 +32,10 @@ typedef struct event_s {
     i32 pid;
     char type;
     char namebuf[24];
-    char exe[256];
-    char cmdline[256];
-    char databuf[256];
-    char net_remote_domain[256];
+    char exe[240];
+    char cmdline[240];
+    char databuf[240];
+    char net_remote_domain[240];
 } event_t;
 
 pthread_mutex_t dns_lock;
@@ -47,15 +47,15 @@ typedef struct rule_s {
     char kind[8]; // send | recv
     char response[6];   // allow | deny
     char duration[16]; // 1-minute | 24-hour | forever
-    char exe[256];
-    char cmdline[256];
+    char exe[240];
+    char cmdline[240];
 
     // fields for: send | recv
-    char port[256]; // %d | ephemeral
+    char port[240]; // %d | ephemeral
     char proto[16]; // udp | tcp | raw | socktype=%d
 
     // fields for: send
-    char addr[256];
+    char addr[240];
 
     // internal fields
     u8 meta; // mark existing rules for deletion check
