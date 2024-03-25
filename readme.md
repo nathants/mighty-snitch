@@ -46,9 +46,9 @@ the primary advantage is that it has direct access to the pid, executable, and c
 
 the primary disadvantage is that it requires a custom kernel.
 
-the visual prompt is a terminal [application](https://github.com/nathants/mighty-snitch/blob/master/snitch-prompt/snitch-prompt) which responds to keyboard input. a new terminal is launched for each prompt and exits after y/n are pressed. [st](https://st.suckless.org/) is used on x86_64 and [foot](https://codeberg.org/dnkl/foot) is used on arm64, though any terminal should work.
+the visual prompt is a terminal [application](https://github.com/nathants/mighty-snitch/blob/master/snitch-prompt/snitch-prompt) which responds to keyboard input. a new terminal is launched for each prompt and exits after y/n are pressed. [st](https://st.suckless.org/) is used on x86_64, though any terminal should work.
 
-the systems fails closed. when snitch isn't running, network requests are not possible.
+the system fails closed. when snitch isn't running, network requests are not possible.
 
 dns packets received on udp 53 are read via [nfq](https://www.netfilter.org/projects/libnetfilter_queue/) so that rules can specify domains in addition to ipv4 addresses.
 
