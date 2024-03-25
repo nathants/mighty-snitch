@@ -22,8 +22,6 @@ finally snitch responds to the kernel and the request is allowed or denied.
 
 ![](https://github.com/nathants/mighty-snitch/raw/master/demo.gif)
 
-![](https://github.com/nathants/mighty-snitch/raw/master/mobile.jpg)
-
 ## hardware
 
 the primary test environments is [arch](https://archlinux.org/)
