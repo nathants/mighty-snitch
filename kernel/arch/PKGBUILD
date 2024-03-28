@@ -1,14 +1,14 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-ver=6.8.1
+ver=6.8.2
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
 arch=(x86_64)
-license=(GPL2)
+license=(GPL-2.0-only)
 depends=(
     libnetfilter_queue python-blessed linux-headers nftables
 )
@@ -17,13 +17,16 @@ makedepends=(
   xmlto python-sphinx python-yaml graphviz imagemagick texlive-latexextra
   git
 )
-options=('!strip')
+options=(
+    '!debug'
+    '!strip'
+)
 source=(
    "$_srcname.tar::https://cdn.kernel.org/pub/linux/kernel/v6.x/$_srcname.tar.xz"
     config
     0001-snitch.patch
 )
-b2sums=('2b518f8f39b4dcea1c580cb0664d59c165db989422fd6fd6b65d3dd1e4548bc6e0cedfc95c2584ae56f69ac1a1d3de6552ee61e77b08799a5275934a453ab929'
+b2sums=('f057c2512040600fbf0df67cf9c7200aee0c06b82b3cf749be8c5685844d2662a585ce17685c7af880c0d9dbbbd81302e5a1fa41c3dbd39869123121a0e82dc2'
         '2aef4a9650b477c2eb464b85b8044fb47233110b41b41ec35e847a56029a7d238e8644a5387d3275a9e0a71412bec1f9ac77b33f088ba73d126ccb39a40e26a2'
         'ee55bda3e0d7604dee30dc2e24bb18e337d288050fe2fcd2a902c37b4e928157491e9a99c2ce2d14954b9ba4c970147f6c78a3ddb3c2c020ee1753e8d6f038ac')
 
