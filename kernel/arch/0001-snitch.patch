@@ -1,20 +1,22 @@
 diff --git a/include/uapi/linux/lsm.h b/include/uapi/linux/lsm.h
-index 33d8c9f4a..cc4dd8dbd 100644
+index 938593dfd..78af7ff83 100644
 --- a/include/uapi/linux/lsm.h
 +++ b/include/uapi/linux/lsm.h
-@@ -64,6 +64,7 @@ struct lsm_ctx {
+@@ -64,7 +64,8 @@ struct lsm_ctx {
  #define LSM_ID_LANDLOCK		110
  #define LSM_ID_IMA		111
  #define LSM_ID_EVM		112
-+#define LSM_ID_SNITCH		113
+-#define LSM_ID_IPE		113
++#define LSM_ID_IPE      113
++#define LSM_ID_SNITCH	114
  
  /*
   * LSM_ATTR_XXX definitions identify different LSM attributes
 diff --git a/security/Kconfig b/security/Kconfig
-index 412e76f15..d33eca066 100644
+index 28e685f53..f55314838 100644
 --- a/security/Kconfig
 +++ b/security/Kconfig
-@@ -188,6 +188,7 @@ source "security/smack/Kconfig"
+@@ -220,6 +220,7 @@ source "security/smack/Kconfig"
  source "security/tomoyo/Kconfig"
  source "security/apparmor/Kconfig"
  source "security/loadpin/Kconfig"
@@ -22,13 +24,13 @@ index 412e76f15..d33eca066 100644
  source "security/yama/Kconfig"
  source "security/safesetid/Kconfig"
  source "security/lockdown/Kconfig"
-@@ -248,4 +249,3 @@ config LSM
+@@ -281,4 +282,3 @@ config LSM
  source "security/Kconfig.hardening"
  
  endmenu
 -
 diff --git a/security/Makefile b/security/Makefile
-index 59f238490..cf910b210 100644
+index cc0982214..3201771ea 100644
 --- a/security/Makefile
 +++ b/security/Makefile
 @@ -20,6 +20,7 @@ obj-$(CONFIG_SECURITY_TOMOYO)		+= tomoyo/
@@ -40,12 +42,12 @@ index 59f238490..cf910b210 100644
  obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
  obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
 diff --git a/security/security.c b/security/security.c
-index 0a9a0ac3f..1afdd3f85 100644
+index c5981e558..c055cba66 100644
 --- a/security/security.c
 +++ b/security/security.c
-@@ -381,14 +381,14 @@ static void __init ordered_lsm_init(void)
- 	ordered_lsms = kcalloc(LSM_COUNT + 1, sizeof(*ordered_lsms),
- 			       GFP_KERNEL);
+@@ -450,14 +450,14 @@ static void __init ordered_lsm_init(void)
+ {
+ 	struct lsm_info **lsm;
  
 -	if (chosen_lsm_order) {
 -		if (chosen_major_lsm) {
