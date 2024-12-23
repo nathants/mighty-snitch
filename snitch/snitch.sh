@@ -5,15 +5,7 @@ cd $(dirname $0)
 
 rm -f snitch
 
-gcc \
-    -Ivendor/ \
-    -Iutil/ \
-    -O3 \
-    -Wall \
-    -flto \
-    -o snitch \
-    snitch.c \
-    $(pkg-config libnetfilter_queue --cflags --libs)
+bash build.sh
 
 echo start snitch
 
