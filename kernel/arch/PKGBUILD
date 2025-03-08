@@ -61,7 +61,7 @@ prepare() {
 
 build() {
   cd $_srcname
-  make all -j $(($(lscpu |grep 'Core(s)'|awk '{print $NF}')+2)) CFLAGS="-march=native -mtune=native"
+  make all -j $(($(lscpu |grep 'Core(s)'|awk '{print $NF}')+2))
 }
 
 _package() {
