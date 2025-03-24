@@ -1,5 +1,5 @@
 pkgbase=linux
-ver=6.13.6
+ver=6.13.8
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
@@ -14,7 +14,7 @@ makedepends=(
   bc libelf pahole cpio perl tar xz python
   xmlto python-sphinx python-yaml graphviz imagemagick texlive-latexextra
   git
-  # rust rust-bindgen rust-src
+  rust rust-bindgen rust-src
 )
 options=(
     '!debug'
@@ -25,8 +25,8 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('5a216c56c77efaee1a3f5c9198ade9180e4640ffcde39662ccf85c2a5945a08c5f362220fb0906369c72a3ea8bdc16fdd24d3e1dbc0f51fc831f3f724ed73300'
-        '183b623b5e82220d3b6f296612fade8013557cad968d2274ecd675c341c54fe8d4efd280861a041b44004737fae79d8be8e1490242b92e7fb55e8dc2cdba65ec'
+b2sums=('c20916a44a07d355ba8337229f102cd507deae92c88576040965e909fa89c09f98611746a8c8f249bc3dcf492238ce3f08c48f523670ccad4bd7ec21622806af'
+        'b5740ac464a58500a5b4c0a1b2042719b1309aa050b68941cba655d9d57898b9b31b910f8d135b4845f4ef9bf1088c2f594a02f9307368f562d95022bfef8b27'
         'a91c4c5ed1524354ce66d42a1a451c0a04e51ca43e4622263217aadc71e8bb7a7b915257878af5b47e74563f6a058fda1512f91839ef12f3433f186026a737c2')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -134,6 +134,14 @@ _package-headers() {
 
   echo "Installing KConfig files..."
   find . -name 'Kconfig*' -exec install -Dm644 {} "$builddir/{}" \;
+
+  echo "Installing Rust files..."
+  install -Dt "$builddir/rust" -m644 rust/*.rmeta
+  install -Dt "$builddir/rust" rust/*.so
+
+  echo "Installing unstripped VDSO..."
+  make INSTALL_MOD_PATH="$pkgdir/usr" vdso_install \
+    link=  # Suppress build-id symlinks
 
   echo "Removing unneeded architectures..."
   local arch
