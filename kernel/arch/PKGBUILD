@@ -1,5 +1,5 @@
 pkgbase=linux
-ver=6.13.8
+ver=6.14.1
 pkgver=$ver.arch1
 _srcname=linux-$ver
 pkgrel=1
@@ -25,8 +25,8 @@ source=(
     config
     0001-snitch.patch
 )
-b2sums=('c20916a44a07d355ba8337229f102cd507deae92c88576040965e909fa89c09f98611746a8c8f249bc3dcf492238ce3f08c48f523670ccad4bd7ec21622806af'
-        'b5740ac464a58500a5b4c0a1b2042719b1309aa050b68941cba655d9d57898b9b31b910f8d135b4845f4ef9bf1088c2f594a02f9307368f562d95022bfef8b27'
+b2sums=('1aa584824d71cf7ac25d3b848aa8c00f7f172dc2491972cb0b4eeebdd491f0f5dc000c55f825da656f3447c3a38eb8d480c5f98927339811247f2cc8c82e3c50'
+        '168a08dc83b681fe4aafbecbd38adbe2dddaaaaa1e799b69de847aa0c83ab9f2c643e62aa64d0f33b271d931d3ba3dad886cf31ccf8d0e23bc04b6958219e018'
         'a91c4c5ed1524354ce66d42a1a451c0a04e51ca43e4622263217aadc71e8bb7a7b915257878af5b47e74563f6a058fda1512f91839ef12f3433f186026a737c2')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -69,7 +69,7 @@ _package() {
   depends=(coreutils kmod initramfs)
   optdepends=('wireless-regdb: to set the correct wireless channels of your country'
               'linux-firmware: firmware images needed for some devices')
-  provides=(VIRTUALBOX-GUEST-MODULES WIREGUARD-MODULE KSMBD-MODULE)
+  provides=(VIRTUALBOX-GUEST-MODULES WIREGUARD-MODULE KSMBD-MODULE NTSYNC-MODULE)
   replaces=(virtualbox-guest-modules-arch wireguard-arch)
 
   cd $_srcname
